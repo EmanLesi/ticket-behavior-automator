@@ -2,9 +2,14 @@ name: Unit Testing
 
 on:
   push:
-    branches: [ main , dev]
-  pull_request:
-    branches: [ main , dev]
+    branches:
+      - main
+      - dev
+      - feature-**
+  pull:
+    branches:
+      - main
+      - dev
 
 jobs:
   build:
