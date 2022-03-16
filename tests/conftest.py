@@ -3,7 +3,6 @@ import tempfile
 
 import pytest
 from core_platform import create_app
-from core_platform.db import get_db, init_db
 
 with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
     _data_sql = f.read().decode('utf8')
@@ -17,10 +16,6 @@ def app():
         'TESTING': True,
         'DATABASE': db_path,
     })
-
-    with app.app_context():
-        init_db()
-        get_db().executescript(_data_sql)
 
     yield app
 
