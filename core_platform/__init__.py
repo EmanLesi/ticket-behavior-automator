@@ -24,7 +24,7 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
+    # a simple page that confirms that the service is online
     @app.route('/healthcheck')
     def healthcheck():
         return {"Server Status": "online"}

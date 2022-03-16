@@ -1,10 +1,15 @@
-name: Unit Testing
+name: Unit Testing and Linting
 
 on:
   push:
-    branches: [ main , dev]
+    branches:
+      - main
+      - dev
+      - feature-**
   pull_request:
-    branches: [ main , dev]
+    branches:
+      - main
+      - dev
 
 jobs:
   build:
@@ -13,7 +18,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.8]
 
     env:
       PYTHONPATH: ${{ github.workspace }}
