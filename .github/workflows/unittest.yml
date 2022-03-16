@@ -2,9 +2,9 @@ name: Unit Testing
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main , dev]
   pull_request:
-    branches: [ main ]
+    branches: [ main , dev]
 
 jobs:
   build:
@@ -14,6 +14,9 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.7, 3.8, 3.9]
+
+    env:
+      PYTHONPATH: ${{ github.workspace }}
 
     steps:
     - uses: actions/checkout@v2
@@ -29,10 +32,12 @@ jobs:
         pip install -r requirements/requirements.txt
     - name: Lint with Flake8
       run: |
+        echo ${{ env.PYTHONPATH }}
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --statistics
     - name: Run Tests with pytest
       run: |
+        echo ${{ env.PYTHONPATH }}
         pytest
