@@ -1,0 +1,4 @@
+include core_platform/schema.sql
+graft core_platform/static
+graft core_platform/templates
+global-exclude *.pyc
