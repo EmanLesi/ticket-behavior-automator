@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}INDEX{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  {% if g.user %}
+    <p> Current User: {{ g.user.username }} </p>
+  {% else %}
+    <p> Create an account (register) and Log in to access content </p>
+  {% endif %}
+
+{% endblock %}
