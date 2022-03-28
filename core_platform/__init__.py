@@ -37,6 +37,10 @@ def create_app(test_config=None):
     app.register_blueprint(dashboard.bp)
     app.add_url_rule('/', endpoint='index')
 
+    # linking views for tickets
+    from core_platform.views import tickets
+    app.register_blueprint(tickets.bp)
+
     # a simple page that confirms that the service is online
     @app.route('/healthcheck')
     def healthcheck():

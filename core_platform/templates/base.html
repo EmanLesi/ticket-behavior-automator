@@ -6,6 +6,8 @@
     {% if g.user %}
       <li><span>{{ g.user['username'] }}</span>
       <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
+      <li><a href="{{ url_for('ticket_views.create_ticket')}}">Create Ticket</a>
+      <li><a href="{{ url_for('ticket_views.ticket_index') }}">ALL Tickets</a>
     {% else %}
       <li><a href="{{ url_for('auth.register') }}">Register</a>
       <li><a href="{{ url_for('auth.login') }}">Log In</a>
