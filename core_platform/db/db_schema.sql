@@ -41,7 +41,7 @@ CREATE TABLE ticket_action (
 CREATE TABLE category(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT UNIQUE NOT NULL,
-  creation_time TIMESTAMP NOT NULL
+  creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE category_allocations(
