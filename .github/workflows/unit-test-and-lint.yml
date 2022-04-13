@@ -39,7 +39,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements/requirements.txt
-
+        python -m spacy download en_core_web_lg
     - name: Lint with Flake8
       run: |
         # based on GitHub pre-made flake8 python app workflow 

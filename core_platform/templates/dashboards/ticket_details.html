@@ -28,6 +28,7 @@
         <input list="categories" name="category" id="category"
                placeholder="enter a new category name here or pick an existing category" size="55px">
         <datalist id="categories">
+            <option value="None">
             {% for category in registered_categories %}
                     <option value="{{category['name']}}">
             {% endfor %}
@@ -72,6 +73,23 @@
       <label for="solution_checkbox">Mark As Solution</label><br>
       <input type="submit" value="Add Comment">
   </form>
+    <h3>Similar Tickets</h3>
+    {% if ticket_sims %}
+        {% for sim in ticket_sims %}
+        <p>
+            <a href="{{ url_for('ticket_views.edit', ticket_id=sim['comp_ticket']) }}">{{ sim['comp_ticket'] }}</a>
+            -- title similarity: {{ sim['title_sim'] }} {% if ticket['short_description_flag'] == 0 %} -- description similarity: {{ sim['desc_sim'] }} {% endif %}
+        </p>
+        {% endfor %}
+    {% else %}
+    <p>NO SIMILAR TICKETS FOUND</p>
+    {% endif %}
+
+      <form action="{{ url_for('ticket_views.reassess_similarity', ticket_id=ticket['id']) }}" method="post">
+          <input type="checkbox" id="apply_actions" name="apply_actions" value="True">
+          <label for="apply_actions">Automatically Apply Actions</label>
+          <input class="danger" type="submit" value="reassess similarity" onclick="return confirm('Are you sure?');">
+      </form>
 
     {% if g.user['username'] == ticket['user_reporter_name'] %}
     <hr>
@@ -81,7 +99,7 @@
           <select name="solution_feedback" id="solution_feedback">
             <option value="select feedback">select feedback</option>
             <option value="resolved by proposed solution">Resolved By Proposed Solution</option>
-            <option value="proposed solution was not affective">Proposed Solution Was Not Affective</option>
+            <option value="proposed solution was not effective">Proposed Solution Was Not Effective</option>
           </select>
           <input type="submit" value="Submit Feedback">
       </form>
@@ -91,7 +109,7 @@
     <h2>Actions</h2>
     {% if ticket_actions %}
       {% for action in ticket_actions %}
-        <p>{% if action['username']  %}{{action['username']}} {%else%} Deleted User {% endif %}{{ action['action_type'] }} at time {{ action['creation_time'] }}
+        <p>{% if action['username']  %}{{action['username']}} {%elif action['associated_user_id'] == 0 %}Automated Support {%else%}Deleted User {% endif %}{{ action['action_type'] }} at time {{ action['creation_time'] }}
           {% if action['action_content'] %}
           <br>
           CONTENT:
@@ -112,4 +130,3 @@
   <hr>
 
 {% endblock %}
-
