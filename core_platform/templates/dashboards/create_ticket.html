@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}New Ticket{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="title">Title</label>
+    <input name="title" id="title" value="{{ request.form['title'] }}" placeholder="A title is required" required>
+    <label for="description">Description</label> <br>
+    <textarea name="description" id="description" placeholder="A description is optional but advised"></textarea>
+    <input type="submit" value="submit">
+  </form>
+{% endblock %}

@@ -24,6 +24,23 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # initialise database instance
+    from core_platform.db import db_manager
+    db_manager.init_app(app)
+
+    # linking views for user authorisation
+    from core_platform.auth import user_auth
+    app.register_blueprint(user_auth.bp)
+
+    # linking views for dashboard
+    from core_platform.views import dashboard
+    app.register_blueprint(dashboard.bp)
+    app.add_url_rule('/', endpoint='index')
+
+    # linking views for tickets
+    from core_platform.views import tickets
+    app.register_blueprint(tickets.bp)
+
     # a simple page that confirms that the service is online
     @app.route('/healthcheck')
     def healthcheck():

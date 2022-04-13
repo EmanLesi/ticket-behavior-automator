@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+
+
+{% block header %}
+  <h1>{% block title %} Ticket ID: {{ticket['id']}}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+    <h3>{{ ticket['title'] }}</h3>
+    <p>{{ ticket['description'] }}</p>
+    <div> <form action="{{ url_for('ticket_views.edit', ticket_id=ticket['id']) }}" method="POST">
+        <label for="status">Current Status: {{ ticket['status'] }} &rarr;</label>
+        <select name="status" id="status">
+            <option value="select new status">select new status</option>
+            <option value="new">new</option>
+            <option value="assigned">assigned</option>
+            <option value="under investigation">under investigation</option>
+            <option value="solution proposed">solution proposed</option>
+            <option value="solution ineffective">solution ineffective</option>
+            <option value="closed">closed</option>
+        </select> <br>
+
+
+
+        <label for="category">Current Category: {{ ticket['category_name'] }} &rarr;</label>
+        <input list="categories" name="category" id="category"
+               placeholder="enter a new category name here or pick an existing category" size="55px">
+        <datalist id="categories">
+            <option value="None">
+            {% for category in registered_categories %}
+                    <option value="{{category['name']}}">
+            {% endfor %}
+        </datalist> <br>
+
+        <label for="priority">Current Priority: {{ ticket['priority'] }} &rarr;</label>
+        <select name="priority" id="priority">
+            <option value="select new priority">select new priority</option>
+            <option value="none">none</option>
+            <option value="low">low</option>
+            <option value="medium">medium</option>
+            <option value="high">high</option>
+            <option value="critical">critical</option>
+        </select> <br>
+
+        <p>reporter: {{ ticket['user_reporter_name'] }} <br>
+            Creation Time: {{ ticket['creation_time'] }} <br>
+            Updated Time: {{ ticket['update_time'] }}</p>
+
+        <label for="assignee">Current Assignee: {{ ticket['user_assignee_name'] }} &rarr; </label>
+        <input list="assignees" name="assignee" id="assignee"
+               placeholder="pick an existing user to be the new assignee" size="50px" >
+        <datalist id="assignees">
+            {% for user in available_assignees %}
+                    <option value="{{user['username']}}">
+            {% endfor %}
+        </datalist> <br>
+        <input type="submit" value="Save">
+
+        <a href="{{ url_for('ticket_views.ticket_index') }}">EXIT</a>
+    </form>
+    </div>
+
+      <form action="{{ url_for('ticket_views.delete_ticket', ticket_id=ticket['id']) }}" method="post">
+        <input class="danger" type="submit" value="Delete Ticket" onclick="return confirm('Are you sure?');">
+      </form>
+      <hr><hr>
+  <form method="post" action="{{ url_for('ticket_views.make_comment_on_ticket', ticket_id=ticket['id']) }}">
+    <label for="comment_action">Comment</label><br>
+    <textarea name="comment_action" id="comment_action" placeholder="add a comment here | use the checkbox if the comment is a solution"></textarea>
+      <input type="checkbox" id="solution_checkbox" name="solution_checkbox" value="True">
+      <label for="solution_checkbox">Mark As Solution</label><br>
+      <input type="submit" value="Add Comment">
+  </form>
+    <h3>Similar Tickets</h3>
+    {% if ticket_sims %}
+        {% for sim in ticket_sims %}
+        <p>
+            <a href="{{ url_for('ticket_views.edit', ticket_id=sim['comp_ticket']) }}">{{ sim['comp_ticket'] }}</a>
+            -- title similarity: {{ sim['title_sim'] }} {% if ticket['short_description_flag'] == 0 %} -- description similarity: {{ sim['desc_sim'] }} {% endif %}
+        </p>
+        {% endfor %}
+    {% else %}
+    <p>NO SIMILAR TICKETS FOUND</p>
+    {% endif %}
+
+      <form action="{{ url_for('ticket_views.reassess_similarity', ticket_id=ticket['id']) }}" method="post">
+          <input type="checkbox" id="apply_actions" name="apply_actions" value="True">
+          <label for="apply_actions">Automatically Apply Actions</label>
+          <input class="danger" type="submit" value="reassess similarity" onclick="return confirm('Are you sure?');">
+      </form>
+
+    {% if g.user['username'] == ticket['user_reporter_name'] %}
+    <hr>
+    <h3>Solution Feedback</h3>
+      <form method="post" action="{{ url_for('ticket_views.solution_feedback', ticket_id=ticket['id']) }}">
+        <label for="solution_feedback">solution feedback</label><br>
+          <select name="solution_feedback" id="solution_feedback">
+            <option value="select feedback">select feedback</option>
+            <option value="resolved by proposed solution">Resolved By Proposed Solution</option>
+            <option value="proposed solution was not effective">Proposed Solution Was Not Effective</option>
+          </select>
+          <input type="submit" value="Submit Feedback">
+      </form>
+      <hr>
+    {%endif%}
+
+    <h2>Actions</h2>
+    {% if ticket_actions %}
+      {% for action in ticket_actions %}
+        <p>{% if action['username']  %}{{action['username']}} {%elif action['associated_user_id'] == 0 %}Automated Support {%else%}Deleted User {% endif %}{{ action['action_type'] }} at time {{ action['creation_time'] }}
+          {% if action['action_content'] %}
+          <br>
+          CONTENT:
+          {{ action['action_content'] }}
+          <br>
+          {% endif%}
+        </p>
+        <form action="{{ url_for('ticket_views.delete_action', ticket_id=ticket['id'], action_id=action['action_id']) }}" method="post">
+            <input class="danger" type="submit" value="Delete Action" onclick="return confirm('Are you sure that you want to remove this action from this ticket's history?');">
+        </form>
+        <hr>
+      {% endfor%}
+
+    {% else %}
+    <p> NO ACTIONS HAVE BEEN PERFORMED ON THIS TICKET </p>
+    {% endif %}
+
+  <hr>
+
+{% endblock %}

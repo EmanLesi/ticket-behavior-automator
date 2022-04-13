@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}ticket index{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  {% if tickets  %}
+    {% for ticket in tickets %}
+      <a href="{{ url_for('ticket_views.edit', ticket_id=ticket['id']) }}">{{ ticket['id'] }}</a>
+      <h2>{{ ticket['title']}}</h2>
+      <div style="text">
+        <p> Status: {{ ticket['status'] }}
+            category: {{ ticket['category'] }}
+            priority: {{ ticket['priority'] }}
+            reporter: {{ ticket['user_reporter_name'] }}
+            assignee: {{ ticket['user_assignee_name'] }}
+            Creation Time: {{ ticket['creation_time'] }}
+            Updated Time: {{ ticket['update_time'] }}</p>
+        <p>{{ ticket['description'] }}</p>
+          <hr>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p> There are no tickets in the system </p>
+  {% endif %}
+{% endblock %}
