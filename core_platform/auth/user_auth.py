@@ -6,7 +6,10 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+
 from core_platform.db.db_manager import get_db
+from core_platform.utils.constants import AUTH_LOGIN_VIEW, AUTH_REGISTER_PAGE_TEMPLATE, INDEX_VIEW, \
+    AUTH_LOGIN_PAGE_TEMPLATE
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -40,11 +43,11 @@ def register():
             except db.IntegrityError:
                 error = f"User {username} is already registered."
             else:
-                return redirect(url_for("auth.login"))
+                return redirect(url_for(AUTH_LOGIN_VIEW))
 
         flash(error)
 
-    return render_template('auth/register.html')
+    return render_template(AUTH_REGISTER_PAGE_TEMPLATE)
 
 
 @bp.route('/login', methods=('GET', 'POST'))
@@ -73,11 +76,11 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('index'))
+            return redirect(url_for(INDEX_VIEW))
 
         flash(error)
 
-    return render_template('auth/login.html')
+    return render_template(AUTH_LOGIN_PAGE_TEMPLATE)
 
 
 @bp.before_app_request
@@ -99,7 +102,7 @@ def logout():
     """ this is the view to end the current user session """
 
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for(INDEX_VIEW))
 
 
 def login_required(view):
@@ -108,7 +111,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return redirect(url_for('auth.login'))
+            return redirect(url_for(AUTH_LOGIN_VIEW))
 
         return view(**kwargs)
 

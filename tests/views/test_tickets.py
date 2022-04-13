@@ -2,7 +2,8 @@
 
 import pytest
 from core_platform.db.db_manager import get_db
-from core_platform.views.tickets import is_valid_text_field, is_valid_drop_down_field
+from core_platform.utils.constants import *
+from core_platform.utils.db_commands import get_ticket_similarities_for_view, get_ticket_actions_for_view
 
 
 def test_ticket_index_with_tickets(client, app):
@@ -25,29 +26,6 @@ def test_ticket_index_with_no_tickets(client, app):
     assert response.status_code == 200
     assert b"<p> There are no tickets in the system </p>" in response.data
     assert b"<h1>ticket index</h1>" in response.data
-
-
-@pytest.mark.parametrize(('value', 'expected_outcome'), (
-        ('', False),
-        (None, False),
-        (' ', False),
-        ('valid test value', True)
-))
-def test_is_valid_text_field(value, expected_outcome):
-    """ tests for text field input validation  """
-
-    assert is_valid_text_field(value) == expected_outcome
-
-
-@pytest.mark.parametrize(('value', 'field_name', 'expected_outcome'), (
-        (None, 'test', False),
-        ('select new test', 'test', False),
-        ('valid test value', 'test', True)
-))
-def test_is_valid_drop_down_field(value, field_name, expected_outcome):
-    """ tests for dropdown input validation  """
-
-    assert is_valid_drop_down_field(value, field_name) == expected_outcome
 
 
 def test_create_ticket_get_page(client, auth, app):
@@ -104,7 +82,7 @@ def test_make_comment(client, auth, app, message_content, expected_response_cont
     with app.app_context():
         db = get_db()
         count = db.execute("SELECT associated_user FROM ticket_action WHERE ticket = 2 AND action_content = ? "
-                           "AND action_type = 'MADE A COMMENT'",
+                           f"AND action_type = '{MADE_A_COMMENT_ACTION}'",
                            (message_content,)).fetchall()
         assert len(count) == expected_response_content
 
@@ -123,7 +101,7 @@ def test_make_a_solution_comment(client, auth, app, message_content, expected_re
     with app.app_context():
         db = get_db()
         count = db.execute("SELECT associated_user FROM ticket_action WHERE ticket = 2 AND action_content = ? "
-                           "AND action_type = 'PROPOSED A SOLUTION'",
+                           f"AND action_type = '{PROPOSED_A_SOLUTION_ACTION}'",
                            (message_content,)).fetchall()
         assert len(count) == expected_response_content
 
@@ -160,25 +138,24 @@ def test_delete_ticket_on_non_existing_ticket(client, auth, app):
 
 
 @pytest.mark.parametrize(('feedback', 'test_query', 'expected_outcome'), (
-        ('resolved by proposed solution', "SELECT id FROM ticket_action WHERE ticket = 3 "
-                                          "AND action_type = 'PROVIDED RESOLUTION'", 1),
-        ('proposed solution was not affective', "SELECT status FROM ticket WHERE id = 3 "
-                                                "AND status = 'solution ineffective'", 1),
-        (None, "SELECT status FROM ticket WHERE id = 3 AND status = 'solution proposed'", 1),
-        ('select feedback', "SELECT status FROM ticket WHERE id = 3 AND status = 'solution proposed'", 1)
+        (RESOLVED_BY_PROPOSED_SOLUTION, "SELECT id FROM ticket_action WHERE ticket = 2 "
+                                        f"AND action_type = '{PROVIDED_RESOLUTION_ACTION}'", 1),
+        (PROPOSED_SOLUTION_INEFFECTIVE, "SELECT status FROM ticket WHERE id = 2 "
+                                        f"AND status = '{DB_TICKET_STATUS_VALUE[4]}'", 1),
+        (None, f"SELECT status FROM ticket WHERE id = 2 AND status = '{DB_TICKET_STATUS_VALUE[3]}'", 1),
+        ('select feedback', f"SELECT status FROM ticket WHERE id = 2 AND status = '{DB_TICKET_STATUS_VALUE[3]}'", 1)
 ))
 def test_solution_feedback(client, auth, app, feedback, test_query, expected_outcome):
     """ test feedback solution feedback system """
 
     auth.login()
-    response = client.post('ticket/3/solution_feedback', data={'solution_feedback': feedback})
+    response = client.post('ticket/2/solution_feedback', data={'solution_feedback': feedback})
     with app.app_context():
-
         db = get_db()
-        count = db.execute(test_query,).fetchall()
+        count = db.execute(test_query, ).fetchall()
         assert len(count) == expected_outcome
         assert response.status_code == 302
-        assert b'>/ticket/3/edit</a>' in response.data
+        assert b'>/ticket/2/edit</a>' in response.data
 
 
 def test_delete_actions_on_existing_ticket(client, auth, app):
@@ -191,12 +168,12 @@ def test_delete_actions_on_existing_ticket(client, auth, app):
     assert b'<h1> Ticket ID: 1</h1>' in ticket_view_response.data
 
     with app.app_context():
-        response = client.post('/ticket/1/delete_action/1')
+        response = client.post('/ticket/5/delete_action/1')
         db = get_db()
         count = db.execute("SELECT id FROM ticket_action WHERE id = 1").fetchall()
         assert len(count) == 0
         assert response.status_code == 302
-        assert b'>/ticket/1/edit</a>' in response.data
+        assert b'>/ticket/5/edit</a>' in response.data
 
 
 def test_delete_actions_on_none_existing_ticket(client, auth, app):
@@ -215,3 +192,19 @@ def test_delete_actions_on_none_existing_ticket(client, auth, app):
         assert len(count) == 1
         assert response.status_code == 302
         assert b'>/ticket/</a>' in response.data
+
+
+@pytest.mark.parametrize(('apply_actions', 'expected_content'), (
+        (True, 2),
+        (None, 0)
+))
+def test_reassess_similarity(client, auth, app, apply_actions, expected_content):
+    """ test the requesting of a ticket to be reassessed for similarities """
+
+    auth.login()
+    response = client.post('ticket/1/reassess_similarity', data={'apply_actions': apply_actions})
+    assert response.status_code == 302
+    assert b'>/ticket/1/edit</a>' in response.data
+    with app.app_context():
+        assert len(get_ticket_similarities_for_view(1)) == 1
+        assert len(get_ticket_actions_for_view(1)) == expected_content
