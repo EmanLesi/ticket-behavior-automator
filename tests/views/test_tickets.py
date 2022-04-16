@@ -11,7 +11,7 @@ def test_ticket_index_with_tickets(client, app):
 
     response = client.get('/ticket/')
     assert response.status_code == 200
-    assert b"<h1>ticket index</h1>" in response.data
+    assert b"""<a href="/ticket/1/edit">#1 </a>""" in response.data
 
 
 def test_ticket_index_with_no_tickets(client, app):
@@ -25,7 +25,7 @@ def test_ticket_index_with_no_tickets(client, app):
     response = client.get('/ticket/')
     assert response.status_code == 200
     assert b"<p> There are no tickets in the system </p>" in response.data
-    assert b"<h1>ticket index</h1>" in response.data
+    assert b"<h1>Ticket Index</h1>" in response.data
 
 
 def test_create_ticket_get_page(client, auth, app):
@@ -35,7 +35,7 @@ def test_create_ticket_get_page(client, auth, app):
 
     response = client.get('ticket/create_ticket')
     assert response.status_code == 200
-    assert b"<h1>New Ticket</h1>" in response.data
+    assert b"<h1>Create New Ticket</h1>" in response.data
     assert b"A description is optional but advised" in response.data
 
 
@@ -65,7 +65,7 @@ def test_view_existing_ticket(client, auth, app):
     auth.login()
     response = client.get('ticket/3/edit')
     assert response.status_code == 200
-    assert b'<h1> Ticket ID: 3</h1>' in response.data
+    assert b"""<sub> Ticket ID: #3</sub>""" in response.data
 
 
 @pytest.mark.parametrize(('message_content', 'expected_response_content',), (
@@ -113,7 +113,7 @@ def test_delete_ticket_on_existing_ticket(client, auth, app):
 
     ticket_view_response = client.get('/ticket/2/edit')
     assert ticket_view_response.status_code == 200
-    assert b'<h1> Ticket ID: 2</h1>' in ticket_view_response.data
+    assert b'<sub> Ticket ID: #2</sub>' in ticket_view_response.data
 
     with app.app_context():
         response = client.post('/ticket/2/delete')
@@ -165,7 +165,7 @@ def test_delete_actions_on_existing_ticket(client, auth, app):
 
     ticket_view_response = client.get('/ticket/1/edit')
     assert ticket_view_response.status_code == 200
-    assert b'<h1> Ticket ID: 1</h1>' in ticket_view_response.data
+    assert b'<sub> Ticket ID: #1</sub>' in ticket_view_response.data
 
     with app.app_context():
         response = client.post('/ticket/5/delete_action/1')
@@ -183,7 +183,7 @@ def test_delete_actions_on_none_existing_ticket(client, auth, app):
 
     ticket_view_response = client.get('/ticket/1/edit')
     assert ticket_view_response.status_code == 200
-    assert b'<h1> Ticket ID: 1</h1>' in ticket_view_response.data
+    assert b'<sub> Ticket ID: #1</sub>' in ticket_view_response.data
 
     with app.app_context():
         response = client.post('/ticket/999/delete_action/1')

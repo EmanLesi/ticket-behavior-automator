@@ -35,6 +35,7 @@ COMMENT_NOT_ADDED_NO_CONTENT = "COMMENT NOT ADDED - your comment does not have a
 NEW_ASSIGNEE_NOT_FOUND = "NEW ASSIGNEE USER NOT FOUND - restoring previous value"
 TICKET_NOT_FOUND = "Ticket with id {} does not exist."
 NO_SOLUTIONS_HAVE_BEEN_PROPOSED = "no solutions have been proposed - enter a solution comment then provide feedback"
+SELECT_FEEDBACK_OPTION = "Please select a feedback option"
 DESCRIPTION_LENGTH_ABOVE_CHARACTER_LIMIT = f"the description is longer than the limit of {TEXT_INPUT_CHARACTER_LIMIT}" \
                                            f" characters"
 

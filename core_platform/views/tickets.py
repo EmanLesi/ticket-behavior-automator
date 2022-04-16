@@ -15,7 +15,10 @@ bp = Blueprint('ticket_views', __name__, url_prefix='/ticket')
 def ticket_index():
     """ view all tickets """
 
-    return render_template(TICKET_INDEX_PAGE_TEMPLATE_LOCATION, tickets=fetchall_tickets_for_index())
+    existing_categories = get_all_category_names()
+
+    return render_template(TICKET_INDEX_PAGE_TEMPLATE_LOCATION, existing_categories_length=len(existing_categories),
+                           existing_categories=existing_categories, tickets=fetchall_tickets_for_index())
 
 
 @bp.route('/create_ticket', methods=('GET', 'POST'))
@@ -202,6 +205,8 @@ def solution_feedback(ticket_id):
 
             else:
                 flash(NO_SOLUTIONS_HAVE_BEEN_PROPOSED)
+
+        flash(SELECT_FEEDBACK_OPTION)
 
     return redirect(url_for(VIEW_TICKET_VIEW, ticket_id=ticket_id))
 

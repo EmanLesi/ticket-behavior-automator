@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}INDEX{% endblock %}</h1>
-{% endblock %}
-
 {% block content %}
-  {% if g.user %}
-    <p> Current User: {{ g.user.username }} </p>
-  {% else %}
-    <p> Create an account (register) and Log in to access content </p>
-  {% endif %}
+<link rel="stylesheet" href="{{ url_for('static', filename='core-style.css') }}">
+<div class="type-1-body">
+    <h1>{% block title %}INDEX{% endblock %}</h1>
+
+    {% if g.user %}
+        <p> Current User: {{ g.user.username }} </p>
+    {% else %}
+        <p> Create an account (register) and Log in to access content </p>
+    {% endif %}
+
+    <p> WIP - THIS PAGE WILL CONTAIN A USER GUIDE AND LINKS TO RELATED MATERIAL </p>
+</div>
 
 {% endblock %}

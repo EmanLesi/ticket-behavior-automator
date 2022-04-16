@@ -1,11 +1,13 @@
 import os
 
 from flask import Flask
+from flask_bootstrap import Bootstrap
 
 
 def create_app(test_config=None):
     # create and configure the core platform
     app = Flask(__name__, instance_relative_config=True)
+    Bootstrap(app)
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'core_platform_db.sqlite'),

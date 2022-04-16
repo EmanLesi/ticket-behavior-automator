@@ -1,25 +1,41 @@
 <!DOCTYPE html>
-<title>{% block title %}{% endblock %}</title>
-<nav>
-  <h1>WIP - CONTENT</h1>
-  <ul>
-    {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span>
-      <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
-      <li><a href="{{ url_for('ticket_views.create_ticket')}}">Create Ticket</a>
-      <li><a href="{{ url_for('ticket_views.ticket_index') }}">ALL Tickets</a>
-    {% else %}
-      <li><a href="{{ url_for('auth.register') }}">Register</a>
-      <li><a href="{{ url_for('auth.login') }}">Log In</a>
-    {% endif %}
-  </ul>
-</nav>
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
+<html lang="en">
+<meta charset="utf-8">
+{% extends "bootstrap/base.html" %}
+<head>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+    <body>
+
+        {% block navbar %}
+        <div class="navbar navbar-default">
+            <ul class="nav navbar-nav">
+                {% if g.user %}
+                    <li role="presentation" style="margin-left: 20px;margin-top: 5px;"><span>Current User:<br>{{ g.user['username'] }}</span></li>
+                    <li role="presentation"><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                    <li role="presentation"><a href="{{ url_for('dashboards.index')}}" title="home"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
+                    <li role="presentation"><a href="{{ url_for('ticket_views.ticket_index') }}">ALL Tickets</a></li>
+                    <li role="presentation"><a href="{{ url_for('ticket_views.create_ticket')}}">Create Ticket</a></li>
+                {% else %}
+                    <li role="presentation"><a href="{{ url_for('auth.register') }}">Register</a></li>
+                    <li role="presentation"><a href="{{ url_for('auth.login') }}">Log In</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endblock %}
+
+        <section class="content">
+            <header>
+                {% block header %}{% endblock %}
+            </header>
+            {% for message in get_flashed_messages() %}
+                <div class="alert alert-warning alert-dismissible" role="alert" style="max-width: 800px;">
+                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>  {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+            {% endfor %}
+            {% block content %}{% endblock %}
+        </section>
+
+    </body>
+</html>
