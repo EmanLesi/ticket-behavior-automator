@@ -9,8 +9,11 @@ click==8.0.4
 colorama==0.4.4
 coverage==6.3.2
 cymem==2.0.6
+dominate==2.6.0
+en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.2.0/en_core_web_lg-3.2.0-py3-none-any.whl
 flake8==4.0.1
 Flask==2.0.3
+Flask-Bootstrap==3.3.7.1
 idna==3.3
 iniconfig==1.1.1
 isort==5.10.1
@@ -47,6 +50,7 @@ tqdm==4.64.0
 typer==0.4.1
 typing_extensions==4.1.1
 urllib3==1.26.9
+visitor==0.1.3
 wasabi==0.9.1
 Werkzeug==2.0.3
 wrapt==1.13.3

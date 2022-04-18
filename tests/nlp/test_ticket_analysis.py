@@ -68,7 +68,9 @@ def test_get_sorted_ticket_sim_analysis_results(app, ticket_id, most_similar_tic
         sorted_ticket_sims = get_sorted_ticket_sim_analysis_results(ticket_id)
         assert len(sorted_ticket_sims) == sorted_ticket_sim_length
         if len(sorted_ticket_sims) > 0:
-            assert sorted_ticket_sims[0] == most_similar_ticket_set
+            assert sorted_ticket_sims[0][0] == most_similar_ticket_set[0]
+            assert round(sorted_ticket_sims[0][1], 4) == round(most_similar_ticket_set[1], 4)
+            assert round(sorted_ticket_sims[0][2], 4) == round(most_similar_ticket_set[2], 4)
 
 
 @pytest.mark.parametrize(('ticket_id', 'most_similar_ticket_set', 'expected_description_flag_value'), (
@@ -81,5 +83,7 @@ def test_generate_ticket_similarities(app, ticket_id, most_similar_ticket_set, e
     with app.app_context():
         ticket_sims, description_flag = generate_ticket_similarities(ticket_id)
         assert len(ticket_sims) == 9
-        assert ticket_sims[0] == most_similar_ticket_set
+        assert ticket_sims[0][0] == most_similar_ticket_set[0]
+        assert round(ticket_sims[0][1], 4) == round(most_similar_ticket_set[1], 4)
+        assert round(ticket_sims[0][2], 4) == round(most_similar_ticket_set[2], 4)
         assert description_flag == expected_description_flag_value
