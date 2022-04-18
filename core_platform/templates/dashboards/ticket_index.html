@@ -5,6 +5,75 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='core-style.css') }}">
 <div class="ticket-content-body">
     <h1>{% block title %}Ticket Index{% endblock %}</h1>
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible alert-bar" role="alert">
+            <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>  {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+    {% endfor %}
+
+    <div class="well well-lg ticket-panel">
+        <div class="container">
+            <div class="row">
+                <div class="col-6 col-sm-4">
+                    <h1>Filter & Sort</h1>
+                    <p>Use the options to the right to filter and sort tickets in the system</p>
+                </div>
+                <div class="col-6 col-sm-5">
+                    <form action="{{ url_for('ticket_views.query') }}" method="POST">
+                        <h4>Filter</h4>
+                        <label for="query_field">Field: </label>
+                            <select name="query_field" id="query_field">
+                                {% if query_field %}
+                                    <optgroup label="Current Field">
+                                        <option value="{{ query_field }}"> {{ query_field }} </option>
+                                    </optgroup>
+                                {% endif %}
+                                <optgroup label="Available Fields">
+                                    <option value="title">title</option>
+                                    <option value="status">status</option>
+                                    <option value="category">category</option>
+                                    <option value="priority">priority</option>
+                                    <option value="reporter">reporter</option>
+                                    <option value="assignee">assignee</option>
+                                </optgroup>
+                            </select>
+                        <label for="query_value"> Value: </label>
+                        <input name="query_value" id="query_value" value="{%if query_holding_value %}{{ query_holding_value }}{% elif query_value %}{{ query_value }}{% endif %}" placeholder="Value to find in field">
+                        <hr class="bar-separator" style="max-width: 400px">
+                        <h4>Sort</h4>
+                            <label for="query_order_field">Order By </label>
+                                <select name="query_order_field" id="query_order_field">
+                                    {% if query_order_field %}
+                                        <optgroup label="Current Order By Field">
+                                            <option value="{{ query_order_field }}">{{ query_order_field | replace('_',' ')  }}</option>
+                                        </optgroup>
+                                    {% endif %}
+                                    <optgroup label="Available Order By Fields">
+                                        <option value="creation_time">creation time</option>
+                                        <option value="update_time">update time</option>
+                                        <option value="title">title</option>
+                                        <option value="status">status</option>
+                                    </optgroup>
+                                </select>
+                            <label for="query_order_value"> In </label>
+                            <select name="query_order_value" id="query_order_value">
+                                <option value="ASC">Ascending</option>
+                                <option value="DESC" {% if query_order_value!="ASC" %}selected{% endif %}>Descending</option>
+                            </select>
+
+                            <label for="query_order_value"> Order </label> <br>
+                        <hr class="bar-separator" style="max-width: 400px">
+                        <input class="btn btn-primary" type="submit" value="Run Query">
+                         <a class="btn btn-default" href="{{ url_for('ticket_views.ticket_index') }}" role="button">Reset</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     {% if tickets  %}
         {% for ticket in tickets %}
             <div class="panel panel-default ticket-panel">
@@ -45,7 +114,7 @@
               </div>
         {% endfor %}
     {% else %}
-        <p> There are no tickets in the system </p>
+        <p> No Tickets Were Found </p>
     {% endif %}
 </div>
 {% endblock %}

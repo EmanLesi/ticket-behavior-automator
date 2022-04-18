@@ -17,9 +17,9 @@ def test_is_valid_text_field(value, expected_outcome):
 
 
 @pytest.mark.parametrize(('value', 'field_name', 'expected_outcome'), (
-        (None, 'test', False),
-        ('select new test', 'test', False),
-        ('valid test value', 'test', True)
+        (None, DB_TICKET_STATUS_VALUE, False),
+        ('select new test', DB_TICKET_STATUS_VALUE, False),
+        ('closed', DB_TICKET_STATUS_VALUE, True)
 ))
 def test_is_valid_drop_down_field(value, field_name, expected_outcome):
     """ tests for dropdown input validation  """

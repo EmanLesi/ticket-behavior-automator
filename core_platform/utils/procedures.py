@@ -14,10 +14,10 @@ def is_valid_text_field(field_value):
     return True
 
 
-def is_valid_drop_down_field(field_value, field_name):
-    """ input validation for dropdown  fields """
+def is_valid_drop_down_field(field_value, acceptable_values):
+    """ input validation for dropdown fields """
 
-    if field_value is None or field_value == f"select new {field_name}":
+    if field_value is None or field_value not in acceptable_values:
         return False
     return True
 
@@ -51,8 +51,7 @@ def clean_text_of_stop_words(text):
 def perform_manual_status_change(new_status, old_status, ticket_id, user_id):
     """ change status to new value """
 
-    if is_valid_drop_down_field(new_status, "status") and new_status != old_status and\
-            new_status in DB_TICKET_STATUS_VALUE:
+    if is_valid_drop_down_field(new_status, DB_TICKET_STATUS_VALUE) and new_status != old_status:
         insert_action_into_db(ticket_id, CHANGED_STATUS_ACTION, new_status, user_id)
         set_ticket_status_in_db(new_status, ticket_id)
         set_ticket_update_time_to_now(ticket_id)
@@ -61,8 +60,7 @@ def perform_manual_status_change(new_status, old_status, ticket_id, user_id):
 def perform_manual_priority_change(new_priority, old_priority, ticket_id, user_id):
     """ change priority to new value """
 
-    if is_valid_drop_down_field(new_priority, "priority") and new_priority != old_priority and\
-            new_priority in DB_TICKET_PRIORITY_VALUE:
+    if is_valid_drop_down_field(new_priority, DB_TICKET_PRIORITY_VALUE) and new_priority != old_priority:
         insert_action_into_db(ticket_id, CHANGED_PRIORITY_ACTION, new_priority, user_id)
         set_ticket_priority_in_db(new_priority, ticket_id)
         set_ticket_update_time_to_now(ticket_id)

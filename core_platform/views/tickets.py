@@ -245,3 +245,58 @@ def reassess_similarity(ticket_id):
         perform_ticket_analysis(apply_actions, ticket_id)
 
     return redirect(url_for(VIEW_TICKET_VIEW, ticket_id=ticket_id))
+
+
+@login_required
+@bp.route('/query/', methods=('GET', 'POST',))
+def query():
+    """ view tickets that fit the user query """
+
+    # extract values
+    query_field = request.form.get("query_field")
+    query_value = request.form.get("query_value")
+    query_order_field = request.form.get("query_order_field")
+    query_order_value = request.form.get("query_order_value")
+    query_holding_value = None
+
+    # validate and reform values
+    if not is_valid_drop_down_field(query_field, DB_TICKET_FIELD_NAMES):
+        query_field = None
+
+    if not is_valid_text_field(query_value):
+        query_value = None
+
+    if query_field == DB_TICKET_FIELD_NAMES[3] and query_value is not None:
+        query_value_category_record = get_id_of_category(query_value.title())
+        if query_value_category_record is None:
+            flash(NOT_A_CATEGORY.format(query_value))
+            query_value = None
+        else:
+            query_holding_value = query_value
+            if query_value.title() == 'None':
+                query_value = query_value.title()
+            else:
+                query_value = query_value_category_record['id']
+
+    if query_field == DB_TICKET_FIELD_NAMES[5] or query_field == DB_TICKET_FIELD_NAMES[6]:
+        query_value_user_record = get_id_of_user(query_value)
+        if query_value_user_record is None:
+            flash(NOT_A_USER.format(query_value))
+            query_value = None
+        else:
+            query_holding_value = query_value
+            query_value = query_value_user_record['id']
+
+    # validate query order
+    if not ((is_valid_drop_down_field(query_order_field, DB_TICKET_FIELD_NAMES) and
+            (query_order_value == DB_FIELD_ORDER_ASC or query_order_value == DB_FIELD_ORDER_DESC))):
+        return redirect(url_for(TICKET_INDEX_VIEW))
+
+    # return ticket index with tickets that fit the criteria
+    existing_categories = get_all_category_names()
+    return render_template(TICKET_INDEX_PAGE_TEMPLATE_LOCATION, existing_categories_length=len(existing_categories),
+                           existing_categories=existing_categories,
+                           tickets=query_tickets_for_index(query_field, query_value, query_order_field,
+                                                           query_order_value),
+                           query_field=query_field, query_value=query_value, query_order_field=query_order_field,
+                           query_order_value=query_order_value, query_holding_value=query_holding_value)

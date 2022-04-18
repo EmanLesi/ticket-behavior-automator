@@ -15,6 +15,27 @@ def test_fetchall_tickets_for_index(app):
         assert db_output[0]['id'] == 10
 
 
+@pytest.mark.parametrize(('query_input', 'number_of_results', 'id_of_first_result'), (
+        (['category', 2, 'creation_time', 'DESC'], 2, 4),
+        (['category', 'None', 'status', 'ASC'], 5, 1),
+        ([None, None, 'update_time', 'DESC'], 10, 2),
+        (['reporter', 1, 'title', 'DESC'], 10, 9),
+        (['assignee', 2, 'creation_time', 'DESC'], 2, 4),
+        (['title', 'ticket', 'title', 'DESC'], 2, 1),
+        (['title', 'This is the first of many tickets', 'update_time', 'DESC'], 1, 1),
+        (['status', 'assigned', 'status', 'ASC'], 2, 5),
+        (['priority', 'low', 'creation_time', 'DESC'], 2, 4),
+        (['status', 'solution proposed', 'title', 'DESC'], 1, 2),
+))
+def test_query_tickets_for_index(app, query_input, number_of_results, id_of_first_result):
+    """ test the retrial of  tickets and associated values from other tables in db for ticket that fit the criteria """
+
+    with app.app_context():
+        db_output = query_tickets_for_index(query_input[0], query_input[1], query_input[2], query_input[3])
+        assert len(db_output) == number_of_results
+        assert db_output[0]['id'] == id_of_first_result
+
+
 def test_get_individual_ticket_for_edit(app):
     """ test the retrieval of a specific ticket from db """
 
