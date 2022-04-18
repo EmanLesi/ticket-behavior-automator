@@ -24,8 +24,9 @@ def query_tickets_for_index(query_field=None, query_value=None, order_field='cre
     else:
         text_filter = f" WHERE {query_field} LIKE '%{query_value}%'"
 
-    if query_field == DB_TICKET_FIELD_NAMES[3] and query_value == 'None':
-        text_filter = " WHERE category IS NULL"
+    if (query_field == DB_TICKET_FIELD_NAMES[3] or (query_field == DB_TICKET_FIELD_NAMES[5] or
+                                                    query_field == DB_TICKET_FIELD_NAMES[6])) and query_value == 'None':
+        text_filter = f" WHERE {query_field} IS NULL"
 
     return get_db().execute('SELECT ticket.id, title, user_reporter.username as user_reporter_name, '
                             'user_assignee.username as user_assignee_name, description, category as category_id, '

@@ -272,20 +272,23 @@ def query():
             flash(NOT_A_CATEGORY.format(query_value))
             query_value = None
         else:
+            query_value = query_value.title()
             query_holding_value = query_value
-            if query_value.title() == 'None':
-                query_value = query_value.title()
-            else:
+            if query_value != DB_CATEGORY_NONE_NAME:
                 query_value = query_value_category_record['id']
 
-    if query_field == DB_TICKET_FIELD_NAMES[5] or query_field == DB_TICKET_FIELD_NAMES[6]:
-        query_value_user_record = get_id_of_user(query_value)
-        if query_value_user_record is None:
-            flash(NOT_A_USER.format(query_value))
-            query_value = None
-        else:
+    if (query_field == DB_TICKET_FIELD_NAMES[5] or query_field == DB_TICKET_FIELD_NAMES[6]) and query_value is not None:
+        if query_value.title() == DB_USER_NONE_NAME:
+            query_value = query_value.title()
             query_holding_value = query_value
-            query_value = query_value_user_record['id']
+        else:
+            query_value_user_record = get_id_of_user(query_value)
+            if query_value_user_record is None:
+                flash(NOT_A_USER.format(query_value))
+                query_value = None
+            else:
+                query_holding_value = query_value
+                query_value = query_value_user_record['id']
 
     # validate query order
     if not ((is_valid_drop_down_field(query_order_field, DB_TICKET_FIELD_NAMES) and

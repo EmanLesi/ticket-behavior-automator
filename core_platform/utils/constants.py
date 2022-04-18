@@ -26,6 +26,7 @@ DB_TICKET_STATUS_VALUE = ["new", "assigned", "under investigation", "solution pr
                           "closed"]
 DB_TICKET_PRIORITY_VALUE = ["none", "low", "medium", "high", "critical"]
 DB_CATEGORY_NONE_NAME = "None"
+DB_USER_NONE_NAME = "None"
 TEXT_INPUT_CHARACTER_LIMIT = 512
 DB_FIELD_ORDER_ASC = "ASC"
 DB_FIELD_ORDER_DESC = "DESC"
