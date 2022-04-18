@@ -1,7 +1,7 @@
 """ reoccurring database interactions """
 from core_platform.db.db_manager import get_db
 from core_platform.utils.constants import DB_CATEGORY_NONE_NAME, DB_TICKET_STATUS_VALUE, DB_TICKET_PRIORITY_VALUE, \
-    DB_FAIL, DB_SUCCESS
+    DB_FAIL, DB_SUCCESS, DB_TICKET_FIELD_NAMES
 
 
 def fetchall_tickets_for_index():
@@ -14,6 +14,26 @@ def fetchall_tickets_for_index():
                             ' LEFT JOIN user user_assignee ON ticket.assignee = user_assignee.id'
                             ' LEFT JOIN category category ON ticket.category = category.id'
                             ' ORDER BY ticket.creation_time DESC').fetchall()
+
+
+def query_tickets_for_index(query_field=None, query_value=None, order_field='creation_time', order_value='DESC'):
+    """ retrieve tickets that fit the criteria and in the specified order """
+
+    if query_field is None or query_value is None:
+        text_filter = ''
+    else:
+        text_filter = f" WHERE {query_field} LIKE '%{query_value}%'"
+
+    if query_field == DB_TICKET_FIELD_NAMES[3] and query_value == 'None':
+        text_filter = " WHERE category IS NULL"
+
+    return get_db().execute('SELECT ticket.id, title, user_reporter.username as user_reporter_name, '
+                            'user_assignee.username as user_assignee_name, description, category as category_id, '
+                            'ticket.creation_time, update_time, priority, status, category.name as category_name'
+                            ' FROM ticket ticket LEFT JOIN user user_reporter ON ticket.reporter = user_reporter.id'
+                            ' LEFT JOIN user user_assignee ON ticket.assignee = user_assignee.id'
+                            ' LEFT JOIN category category ON ticket.category = category.id'
+                            f'{text_filter} ORDER BY ticket.{order_field} {order_value}').fetchall()
 
 
 def get_individual_ticket_for_edit(ticket_id):
@@ -121,7 +141,7 @@ def get_all_registered_users():
 def get_all_category_names():
     """ retrieve all category names in db """
 
-    return get_db().execute('SELECT DISTINCT name FROM category').fetchall()
+    return get_db().execute('SELECT name FROM category').fetchall()
 
 
 def get_username_from_id(user_id):

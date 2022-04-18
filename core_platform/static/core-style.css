@@ -1,0 +1,84 @@
+.type-1-body{
+    margin: 25px;
+}
+
+.ticket-content-body{
+    margin-left: 100px;
+    margin-right: 100px;
+    min-width=600px;
+}
+
+.alert-bar{
+    max-width: 800px;
+}
+
+.ticket-panel{
+    max-width: 800px;
+}
+
+.ticket-detail-section{
+    max-width: 800px;
+}
+
+.ticket-panel-content{
+    padding-left: 15px;
+}
+
+#ticket-detail-title{
+    margin-bottom: 0px;
+}
+
+.bar-separator{
+    width: 800px;
+    border-top: 5px solid #eee;
+    margin: 0;
+}
+
+.action-group{
+    max-width: 600px;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+.ticket-status-new{
+    background-color: #00a1ff;
+}
+
+.ticket-status-assigned{
+    background-color: #ffa500;
+}
+
+.ticket-status-under-investigation{
+    background-color: #ffa500;
+    color: #000000
+}
+
+.ticket-status-solution-proposed{
+    background-color: #9725ab;
+}
+
+.ticket-status-solution-ineffective{
+    background-color: #ff3737;
+}
+
+.ticket-status-closed{
+    background-color: #4caf50;
+}
+
+
+.ticket-priority-low{
+    background-color: #4caf50;
+}
+
+.ticket-priority-medium{
+    background-color: #ffa500;
+}
+
+.ticket-priority-high{
+    background-color: #ff3737;
+}
+
+.ticket-priority-critical{
+    background-color: #ff3737;
+    color: #000000
+}

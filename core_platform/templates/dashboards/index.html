@@ -1,15 +1,92 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}INDEX{% endblock %}</h1>
-{% endblock %}
-
 {% block content %}
-  {% if g.user %}
-    <p> Current User: {{ g.user.username }} </p>
-  {% else %}
-    <p> Create an account (register) and Log in to access content </p>
-  {% endif %}
+<link rel="stylesheet" href="{{ url_for('static', filename='core-style.css') }}">
+<div class="type-1-body">
+    <h1>{% block title %}INDEX{% endblock %}</h1>
+
+    {% if g.user %}
+        <p> Current User: {{ g.user.username }} </p>
+    {% else %}
+        <p> Create an account (register) and Log in to access content </p>
+    {% endif %}
+
+    <h1>Project Information</h1>
+    <p>This web application was made as part of Emmanuel Lesi’s final year project. <br>
+        Supporting Resources can be found in the links below: </p>
+    <ul>
+        <li><a href="https://github.com/EmanLesi/ticket-behavior-automator">Github Project Code Repository</a></li>
+        <li>Project Report – link pending</li>
+        <li>Project Video – link pending</li>
+    </ul>
+
+
+    <h2>Getting Started</h2>
+    <p>To get started <a href="{{ url_for('auth.login') }}">Log In</a> or <a href="{{ url_for('auth.register') }}">Register</a> a new account by going to the options in the navigation bar. <br>
+        <a href="{{ url_for('auth.logout') }}">Log Out</a> to get to access the registration and login options in the navigation bar.
+    </p>
+
+    <h2>Create Ticket</h2>
+    <p>The '<a href="{{ url_for('ticket_views.create_ticket')}}">Create Ticket</a>' button can be found in the navigation bar at the top of the display. <br>
+        The title and description of a new ticket can be entered here.  <br>
+        Submitting a ticket initiates the ticket analysis process to find similar tickets in the system and automatically apply attributes and present solutions for the ticket.
+    </p>
+
+    <h2>All Tickets</h2>
+    <p>Selecting the '<a href="{{ url_for('ticket_views.ticket_index') }}">ALL Tickets</a>' leads to the ticket index which displays all the tickets in the system.</p>
+
+    <h3>Ticket Content</h3>
+    <p>Each ticket contains:</p>
+    <ul>
+        <li>An ID</li>
+        <li>A Title</li>
+        <li>A Description</li>
+        <li>Status</li>
+        <li>Priority</li>
+        <li>Reporter</li>
+        <li>Assignee</li>
+        <li>Category</li>
+        <li>Creation Time</li>
+        <li>Updated Time</li>
+    </ul>
+
+
+    <h3>Sorting Options</h3>
+    <p>At the top of the <a href="{{ url_for('ticket_views.ticket_index') }}">ticket index page</a> are a set of sorting option that can query the system to filter out tickets based on a user made set of criteria.</p>
+
+    <h2>Ticket Details</h2>
+    <p>Clicking ticket id on the <a href="{{ url_for('ticket_views.ticket_index') }}">ticket index page</a> will display the ticket details. </p>
+
+    <h3>Editing Panel</h3>
+    <p>The top of this page is an editing panel that features:<br>
+        Dropdown menus to change the ticket status and priority. <br>
+        Textboxes to change assignee and category of the ticket, with dropdown options for each textbox containing the users that can be assignees and categories that already exist the system. <br>
+        The reporter, ticket title, description, creation time and update time remain constant throughout the life span of a ticket.
+    </p>
+
+    <h3>Ticket Similarities</h3>
+    <p>Below that is the ticket similarities section that displays the top 3 results of the ticket similarity processing. <br>
+        Clicking a result will display the ticket details. <br>
+        The similarity results can be manually reassessed to account for new tickets that have arrived after the initial assessment by clicking the 'Reassess Similarity'. <br>
+        Clicking the 'Automatically Apply Actions' checkbox will automatically change the attributes of the ticket If there is a common value amongst the summary tickets. <br>
+        Any solutions that have been proposed in the similar tickets are displayed in the actions of the ticket.
+    </p>
+
+    <h3>Solution Feedback</h3>
+    <p>If the user viewing the ticket is the reporter of the ticket, they are presented with a solution feedback section that allows them to update the ticket with by notifying the system that the last solution that was proposed was able to resolve the issue. <br>
+        This will automatically close the ticket as well as notify other similar tickets of the solution.<br>
+        Deeming the last solution as ineffective will change the status to solution ineffective to notify support team that the last solution was not effective. <br>
+        If multiple solutions are entered under a ticket, is it is advised that the ineffective solutions are deleted so that the most recent proposed solution is the solution that worked, so that the solution feedback will apply to that solution. <br>
+    </p>
+
+    <h3>Comments</h3>
+    <p>Comments can be added to a ticket to hold a dialogue about the ticket and if a solution is found checking the 'Mark As Solution' checkbox will change the status of the ticket, and label the comment as a potential solution for the user to provide feedback on.
+    </p>
+
+    <h3>Actions</h3>
+    <p>Finally, all actions, comments and solutions are displayed at the bottom and can be removed using the 'Delete Action' button.</p>
+
+</div>
 
 {% endblock %}
