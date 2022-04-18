@@ -235,7 +235,7 @@ def test_query_sorting(client, auth, app, query_data):
         ([None, None, None, None], 302, b"""<a href="/ticket/">/ticket/</a>"""),
         (['not a field', 'This is the first of many tickets', 'status', 'DESC'], 200,
          b"""<a href="/ticket/1/edit">#1 </a>"""),
-        (['assignee', None, 'title', 'DESC'], 200, bytes(NOT_A_USER.format('None'), 'utf-8')),
+        (['assignee', None, 'title', 'DESC'], 200, b"""<a href="/ticket/1/edit">#1 </a>"""),
         (['reporter', 'not a user', 'update_time', 'ASC'], 200, bytes(NOT_A_USER.format('not a user'), 'utf-8')),
         (['category', 'not a category', 'creation_time', 'DESC'], 200,
          bytes(NOT_A_CATEGORY.format('not a category'), 'utf-8')),
@@ -320,6 +320,7 @@ def test_search_tickets_for_category(client, auth, app, query_data, expected_out
 @pytest.mark.parametrize(('query_data', 'expected_outcome'), (
         (['reporter', 'test_user', 'creation_time', 'DESC'], b"""<a href="/ticket/1/edit">#1 </a>"""),
         (['assignee', 'a_third_user', 'creation_time', 'DESC'], b"""<a href="/ticket/5/edit">#5 </a>"""),
+        (['assignee', 'None', 'title', 'DESC'], b"""<a href="/ticket/1/edit">#1 </a>"""),
         (['reporter', 'a_forth_user', 'creation_time', 'DESC'], bytes(NOT_A_USER.format('a_forth_user'), 'utf-8')),
         (['assignee', 'a_forth_user', 'creation_time', 'DESC'], bytes(NOT_A_USER.format('a_forth_user'), 'utf-8')),
 ))

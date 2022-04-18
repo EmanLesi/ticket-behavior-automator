@@ -1,4 +1,4 @@
-""" Tests for database manager"""
+""" Tests for database manager """
 
 import sqlite3
 

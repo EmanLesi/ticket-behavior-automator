@@ -21,6 +21,7 @@ def test_fetchall_tickets_for_index(app):
         ([None, None, 'update_time', 'DESC'], 10, 2),
         (['reporter', 1, 'title', 'DESC'], 10, 9),
         (['assignee', 2, 'creation_time', 'DESC'], 2, 4),
+        (['assignee', 'None', 'creation_time', 'DESC'], 6, 10),
         (['title', 'ticket', 'title', 'DESC'], 2, 1),
         (['title', 'This is the first of many tickets', 'update_time', 'DESC'], 1, 1),
         (['status', 'assigned', 'status', 'ASC'], 2, 5),

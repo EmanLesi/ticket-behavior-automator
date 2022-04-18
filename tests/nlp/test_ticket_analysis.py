@@ -1,4 +1,4 @@
-""" tests for the NLP ticket analyis """
+""" tests for the NLP ticket analysis """
 import pytest
 
 from core_platform.nlp.ticket_analysis import *

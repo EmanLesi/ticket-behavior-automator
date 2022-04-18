@@ -14,4 +14,5 @@ def test_healthcheck(client):
     """ test healthcheck """
 
     response = client.get('/healthcheck')
-    assert response.data == b'{"Server Status":"online"}\n'
+    assert b'Server Status' in response.data
+    assert b'online' in response.data
