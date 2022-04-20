@@ -164,13 +164,25 @@ def edit(ticket_id):
     # get ticket similarities
     ticket_sims = get_ticket_similarities_for_view(ticket_id)
 
+    similar_ticket_attributes = {}
+
+    for similar_ticket in ticket_sims:
+        similar_ticket_fields = get_individual_ticket_for_edit(similar_ticket['comp_ticket'])
+        similar_ticket_attributes[similar_ticket['comp_ticket']] = [similar_ticket_fields['status'],
+                                                                    similar_ticket_fields['priority'],
+                                                                    get_id_of_user(similar_ticket_fields['assignee']),
+                                                                    get_name_of_category(
+                                                                        similar_ticket_fields['category'])['name'],
+                                                                    len(get_all_solutions_from_tickets(
+                                                                        similar_ticket['comp_ticket']))]
+
     # get existing users and categories
     assignees = get_all_registered_users()
     registered_categories = get_all_category_names()
 
     return render_template(VIEW_TICKET_PAGE_TEMPLATE_LOCATION, ticket=ticket, ticket_actions=ticket_actions,
                            available_assignees=assignees, registered_categories=registered_categories,
-                           ticket_sims=ticket_sims)
+                           ticket_sims=ticket_sims, similar_ticket_attributes=similar_ticket_attributes)
 
 
 @login_required
@@ -193,7 +205,7 @@ def solution_feedback(ticket_id):
             if last_solution is not None:
                 content, solution_status, new_ticket_status = None, None, None
                 if feedback == RESOLVED_BY_PROPOSED_SOLUTION:
-                    content, solution_status, new_ticket_status = CONFIRMED_SOLUTION, PROVIDED_RESOLUTION_ACTION,\
+                    content, solution_status, new_ticket_status = CONFIRMED_SOLUTION, PROVIDED_RESOLUTION_ACTION, \
                                                                   DB_TICKET_STATUS_VALUE[5]
 
                 elif feedback == PROPOSED_SOLUTION_INEFFECTIVE:
@@ -292,7 +304,7 @@ def query():
 
     # validate query order
     if not ((is_valid_drop_down_field(query_order_field, DB_TICKET_FIELD_NAMES) and
-            (query_order_value == DB_FIELD_ORDER_ASC or query_order_value == DB_FIELD_ORDER_DESC))):
+             (query_order_value == DB_FIELD_ORDER_ASC or query_order_value == DB_FIELD_ORDER_DESC))):
         return redirect(url_for(TICKET_INDEX_VIEW))
 
     # return ticket index with tickets that fit the criteria
