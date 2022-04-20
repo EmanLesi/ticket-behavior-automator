@@ -118,7 +118,12 @@
         {% for sim in ticket_sims %}
             <a href="{{ url_for('ticket_views.edit', ticket_id=sim['comp_ticket']) }}" class="list-group-item">
                 <h4 class="list-group-item-heading">Ticket ID: #{{ sim['comp_ticket'] }}</h4>
-                <p>Title Similarity: <span class="badge">{{ (sim['title_sim'] * 100)| round(2)  }}%</span> {% if ticket['short_description_flag'] == 0 %} <br>Description Similarity: <span class="badge">{{ (sim['desc_sim'] * 100)| round(2) }}%</span>{% endif %}</p>
+                <p>Title Similarity: <span class="badge">{{ (sim['title_sim'] * 100)| round(2)  }}%</span> {% if ticket['short_description_flag'] == 0 %} | Description Similarity: <span class="badge">{{ (sim['desc_sim'] * 100)| round(2) }}%</span>{% endif %}<br>
+                    <b>Status:</b> <span class="label label-default ticket-status-{{ similar_ticket_attributes[sim['comp_ticket']][0] | replace(' ','-') }}">{{ similar_ticket_attributes[sim['comp_ticket']][0] }}</span> |
+                    <b>Priority:</b> <span class="label label-default ticket-priority-{{ similar_ticket_attributes[sim['comp_ticket']][1] }} ">{{ similar_ticket_attributes[sim['comp_ticket']][1] }} </span> |
+                    <b>Assignee:</b> {{ similar_ticket_attributes[sim['comp_ticket']][2] }} |
+                    <b>Category:</b> {{ similar_ticket_attributes[sim['comp_ticket']][3] }} | <b>Potential Solutions:</b> {{ similar_ticket_attributes[sim['comp_ticket']][4] }}
+                </p>
             </a>
         {% endfor %}
         </div>
