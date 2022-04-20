@@ -2,7 +2,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='core-style.css') }}">
-<div id="type-1-body">
+<div class="type-1-body">
     <h1>{% block title %}Log In{% endblock %}</h1>
 
     {% for message in get_flashed_messages() %}
