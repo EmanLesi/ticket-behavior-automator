@@ -71,20 +71,16 @@ def make_comment_on_ticket(ticket_id):
 
             comment_type = MADE_A_COMMENT_ACTION
 
-            print(solution_checkbox)
-
             # check if comment is a solution
             if get_check_box_value(solution_checkbox):
                 comment_type = PROPOSED_A_SOLUTION_ACTION
-            print(comment_type)
+
             # add comment to action on a ticket
             user_id = get_id_of_user(g.user['username'])['id']
             if insert_action_into_db(ticket_id, comment_type, comment_action, user_id) == DB_FAIL:
                 flash(COMMENT_NOT_ADDED_DB_ISSUE)
             else:
-                print(comment_type)
                 if comment_type == PROPOSED_A_SOLUTION_ACTION:
-                    print("here")
                     set_ticket_status_in_db(DB_TICKET_STATUS_VALUE[3], ticket_id)
                 set_ticket_update_time_to_now(ticket_id)
         else:
@@ -118,12 +114,6 @@ def edit(ticket_id):
 
         user_id = get_id_of_user(g.user['username'])['id']
 
-        # set new status
-        perform_manual_status_change(new_status, old_status, ticket_id, user_id)
-
-        # set new priority
-        perform_manual_priority_change(new_priority, old_priority, ticket_id, user_id)
-
         # set new category
         if is_valid_text_field(new_category_name):
 
@@ -154,6 +144,13 @@ def edit(ticket_id):
             else:
                 flash(NEW_ASSIGNEE_NOT_FOUND)
 
+        # set new status
+        perform_manual_status_change(new_status, old_status, ticket_id, user_id)
+
+        # set new priority
+        perform_manual_priority_change(new_priority, old_priority, ticket_id, user_id)
+
+
     # get all associated ticket data across tables in the database
     ticket = get_individual_ticket_for_view(ticket_id)
 
@@ -173,7 +170,8 @@ def edit(ticket_id):
         similar_ticket_fields = get_individual_ticket_for_edit(similar_ticket['comp_ticket'])
         similar_ticket_attributes[similar_ticket['comp_ticket']] = [similar_ticket_fields['status'],
                                                                     similar_ticket_fields['priority'],
-                                                                    get_id_of_user(similar_ticket_fields['assignee']),
+                                                                    get_username_from_id(
+                                                                        similar_ticket_fields['assignee']),
                                                                     get_name_of_category(
                                                                         similar_ticket_fields['category'])['name'],
                                                                     len(get_all_solutions_from_tickets(

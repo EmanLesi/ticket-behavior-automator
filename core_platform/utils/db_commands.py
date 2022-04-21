@@ -142,7 +142,7 @@ def get_all_registered_users():
 def get_all_category_names():
     """ retrieve all category names in db """
 
-    return get_db().execute('SELECT name FROM category').fetchall()
+    return get_db().execute('SELECT name FROM category ORDER BY id ASC').fetchall()
 
 
 def get_username_from_id(user_id):

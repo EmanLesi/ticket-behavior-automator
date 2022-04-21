@@ -81,7 +81,8 @@ def perform_manual_assignee_change(new_assignee_id, old_assignee, new_assignee_u
     if new_assignee_id != old_assignee and new_assignee_id is not None:
         insert_action_into_db(ticket_id, CHANGED_ASSIGNEE_ACTION, new_assignee_user, user_id)
         set_ticket_assignee_in_db(new_assignee_id, ticket_id)
-        set_ticket_status_in_db(DB_TICKET_STATUS_VALUE[1], ticket_id)
+        if get_individual_ticket_for_edit(ticket_id)[DB_TICKET_FIELD_NAMES[4]] == DB_TICKET_STATUS_VALUE[0]:
+            set_ticket_status_in_db(DB_TICKET_STATUS_VALUE[1], ticket_id)
         set_ticket_update_time_to_now(ticket_id)
 
 

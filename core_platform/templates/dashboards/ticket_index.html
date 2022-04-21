@@ -103,8 +103,8 @@
 
                     <div class="ticket-panel-content">
                         Category:
-                        {% if ticket['category_id'] and ticket['category_id'] < existing_categories_length %}
-                        {{ existing_categories[ticket['category_id']]['name'] }}
+                        {% if ticket['category_id'] and (ticket['category_id'] <= existing_categories_length) %}
+                        {{ existing_categories[ticket['category_id']-1]['name'] }}
                         {% else %} None {% endif %}
                         <br>
                         <h3> Description: </h3>

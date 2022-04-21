@@ -122,22 +122,23 @@ def test_perform_manual_category_change(app, value, action_count_increment):
         assert len(new_ticket_actions) == len(old_ticket_actions) + action_count_increment
 
 
-@pytest.mark.parametrize(('value', 'new_status', 'action_count_increment'), (
-        (3, DB_TICKET_STATUS_VALUE[1], 1),
-        (2, DB_TICKET_STATUS_VALUE[2], 0),
+@pytest.mark.parametrize(('ticket_id', 'value', 'new_status', 'action_count_increment'), (
+        (1, 2, DB_TICKET_STATUS_VALUE[1], 1),
+        (3, 3, DB_TICKET_STATUS_VALUE[2], 1),
+        (3, 2, DB_TICKET_STATUS_VALUE[2], 0),
 ))
-def test_perform_manual_assignee_change(app, value, new_status, action_count_increment):
+def test_perform_manual_assignee_change(app, ticket_id, value, new_status, action_count_increment):
     """ test procedure to change ticket assignee """
 
     with app.app_context():
-        old_assignee = get_individual_ticket_for_edit(3)['assignee']
-        old_ticket_actions = get_ticket_actions_for_view(3)
+        old_assignee = get_individual_ticket_for_edit(ticket_id)['assignee']
+        old_ticket_actions = get_ticket_actions_for_view(ticket_id)
         assignee_name = get_username_from_id(value)['username']
 
-        perform_manual_assignee_change(value, old_assignee, assignee_name, 3, 0)
+        perform_manual_assignee_change(value, old_assignee, assignee_name, ticket_id, 0)
 
-        new_ticket = get_individual_ticket_for_edit(3)
-        new_ticket_actions = get_ticket_actions_for_view(3)
+        new_ticket = get_individual_ticket_for_edit(ticket_id)
+        new_ticket_actions = get_ticket_actions_for_view(ticket_id)
         assert new_ticket['assignee'] == value
         assert new_ticket['status'] == new_status
         assert len(new_ticket_actions) == len(old_ticket_actions) + action_count_increment
