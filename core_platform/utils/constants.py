@@ -38,6 +38,7 @@ UNABLE_TO_CREATE_TICKET_INVALID_CONTENT = "Unable To Create Ticket - Invalid Con
 COMMENT_NOT_ADDED_DB_ISSUE = "COMMENT NOT ADDED - unable to add comment to ticket"
 COMMENT_NOT_ADDED_NO_CONTENT = "COMMENT NOT ADDED - your comment does not have any content"
 NEW_ASSIGNEE_NOT_FOUND = "NEW ASSIGNEE USER NOT FOUND - restoring previous value"
+NEW_CATEGORY_NAME_IS_TOO_LONG = "new category name is too long - reverting to previous value"
 NOT_A_USER = "{} - Is not a registered user"
 NOT_A_CATEGORY = "{} - Is not a registered category"
 TICKET_NOT_FOUND = "Ticket with id {} does not exist."

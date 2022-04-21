@@ -139,6 +139,9 @@ def edit(ticket_id):
 
             perform_manual_category_change(new_category['id'], old_category, new_category_name, ticket_id, user_id)
 
+        elif len(new_category_name) > TEXT_INPUT_CHARACTER_LIMIT:
+            flash(NEW_CATEGORY_NAME_IS_TOO_LONG)
+
         # set new assignee
         if is_valid_text_field(new_assignee_user):
             # varify the existence of the assignee as a user in the system
@@ -217,8 +220,8 @@ def solution_feedback(ticket_id):
 
             else:
                 flash(NO_SOLUTIONS_HAVE_BEEN_PROPOSED)
-
-        flash(SELECT_FEEDBACK_OPTION)
+        else:
+            flash(SELECT_FEEDBACK_OPTION)
 
     return redirect(url_for(VIEW_TICKET_VIEW, ticket_id=ticket_id))
 
