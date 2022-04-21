@@ -65,9 +65,9 @@
                             <div class="col-6 col-sm-5">
                                 <label for="assignee">Assignee: </label>
                                 {% if ticket['user_assignee_name'] %}
-                                    <input list="assignees" name="assignee" id="assignee" value="{{ ticket['user_assignee_name'] }}" placeholder="pick an existing user to be the new assignee">
+                                    <input list="assignees" name="assignee" id="assignee" value="{{ ticket['user_assignee_name'] }}" placeholder="pick an existing user to be the new assignee" maxlength="128">
                                 {% else %}
-                                    <input list="assignees" name="assignee" id="assignee" placeholder="pick assignee from existing users">
+                                    <input list="assignees" name="assignee" id="assignee" placeholder="pick assignee from existing users" maxlength="128">
                                 {% endif %}
                                     <datalist id="assignees">
                                         {% for user in available_assignees %}
@@ -88,9 +88,9 @@
                     <div class="ticket-panel-content">
                         <label for="category" >Category: </label>
                         {% if ticket['category_name'] %}
-                            <input list="categories" name="category" id="category" value="{{ ticket['category_name'] }}" placeholder="enter a new category name here or pick an existing category" style="width: -webkit-fill-available;">
+                            <input list="categories" name="category" id="category" value="{{ ticket['category_name'] }}" placeholder="enter a new category name here or pick an existing category or enter 'None' to remove category" maxlength="128" style="width: -webkit-fill-available;">
                         {% else %}
-                            <input list="categories" name="category" id="category" placeholder="enter a new category name here or pick an existing category" style="width: -webkit-fill-available;">
+                            <input list="categories" name="category" id="category" placeholder="enter a new category name here or pick an existing category or enter 'None' to remove category" maxlength="128" style="width: -webkit-fill-available;">
                         {% endif %}
                             <datalist id="categories">
                                 <option value="None">
@@ -165,7 +165,7 @@
     <div class="ticket-detail-section">
         <h3>Comment</h3>
         <form method="post" action="{{ url_for('ticket_views.make_comment_on_ticket', ticket_id=ticket['id']) }}" style="text-align: center;">
-            <textarea name="comment_action" id="comment_action" placeholder="add a comment here | use the checkbox if the comment is a solution" cols="100" rows="1" required></textarea>
+            <textarea name="comment_action" id="comment_action" placeholder="add a comment here | use the checkbox if the comment is a solution" cols="100" rows="1" maxlength="512" required></textarea>
             <br>
             <input type="checkbox" id="solution_checkbox" name="solution_checkbox" value="True">
             <label for="solution_checkbox">Mark As Solution</label><br>

@@ -40,7 +40,7 @@
                                 </optgroup>
                             </select>
                         <label for="query_value"> Value: </label>
-                        <input name="query_value" id="query_value" value="{%if query_holding_value %}{{ query_holding_value }}{% elif query_value %}{{ query_value }}{% endif %}" placeholder="Value to find in field">
+                        <input name="query_value" id="query_value" value="{%if query_holding_value %}{{ query_holding_value }}{% elif query_value %}{{ query_value }}{% endif %}" placeholder="Value to find in field" maxlength="256">
                         <hr class="bar-separator" style="max-width: 400px">
                         <h4>Sort</h4>
                             <label for="query_order_field">Order By </label>
