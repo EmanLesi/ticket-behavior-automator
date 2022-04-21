@@ -53,3 +53,9 @@ jobs:
       run: |
         echo ${{ env.PYTHONPATH }}
         pytest
+
+    - name: Test Coverage
+      run: |
+        coverage run -m pytest
+        coverage report -m 
+
