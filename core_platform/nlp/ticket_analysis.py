@@ -71,11 +71,9 @@ def apply_actions_from_ticket_sim_analysis(ticket_sims, ticket_id):
 
         # automatically set new assignee
         new_assignee = get_attribute_from_simular_tickets(sim_ticket_ids, "assignee", None)
-        new_assignee_name = get_username_from_id(new_assignee)
-        if new_assignee_name is not None:
-            new_assignee_name = new_assignee_name['username']
 
-        perform_manual_assignee_change(new_assignee, old_ticket['assignee'], new_assignee_name, ticket_id, 0)
+        perform_manual_assignee_change(new_assignee, old_ticket['assignee'],
+                                       get_username_from_id(new_assignee)['username'], ticket_id, 0)
 
         # automatically set new status
         new_status = get_attribute_from_simular_tickets(sim_ticket_ids, "status", old_ticket['status'])
@@ -97,7 +95,8 @@ def apply_actions_from_ticket_sim_analysis(ticket_sims, ticket_id):
         potential_solutions = get_all_solutions_from_tickets(sim_ticket_ids)
 
         known_solutions = list(filter(lambda potential_solution:
-                                      potential_solution['action_type'] == PROVIDED_RESOLUTION_ACTION,
+                                      potential_solution['action_type'] in (PROVIDED_RESOLUTION_ACTION,
+                                                                            PROPOSED_A_SOLUTION_ACTION),
                                       potential_solutions))
 
         if len(known_solutions) < 1:

@@ -3,7 +3,8 @@
 import pytest
 from core_platform.db.db_manager import get_db
 from core_platform.utils.constants import *
-from core_platform.utils.db_commands import get_ticket_similarities_for_view, get_ticket_actions_for_view
+from core_platform.utils.db_commands import get_ticket_similarities_for_view, get_ticket_actions_for_view, \
+    get_individual_ticket_for_view
 
 
 def test_ticket_index_with_tickets(client, app):
@@ -66,6 +67,26 @@ def test_view_existing_ticket(client, auth, app):
     response = client.get('ticket/3/edit')
     assert response.status_code == 200
     assert b"""<sub> Ticket ID: #3</sub>""" in response.data
+
+
+@pytest.mark.parametrize('new_values',
+                         (["under investigation", "low", "a_third_user", "Off Center Items"],
+                          ["new", "high", "another_user", "Mac Scroll Issue"]))
+def test_edit_existing_ticket(client, auth, app, new_values):
+    """ test editing an existing ticket """
+
+    auth.login()
+    response = client.post('ticket/3/edit', data={"status": new_values[0], "priority": new_values[1],
+                                                  "assignee": new_values[2], "category": new_values[3]})
+
+    with app.app_context():
+        assert response.status_code == 200
+        assert b"""<sub> Ticket ID: #3</sub>""" in response.data
+        db_output = get_individual_ticket_for_view(3)
+        assert db_output['status'] == new_values[0]
+        assert db_output['priority'] == new_values[1]
+        assert db_output['user_assignee_name'] == new_values[2]
+        assert db_output['category_name'] == new_values[3]
 
 
 @pytest.mark.parametrize(('message_content', 'expected_response_content',), (
@@ -195,14 +216,14 @@ def test_delete_actions_on_none_existing_ticket(client, auth, app):
 
 
 @pytest.mark.parametrize(('apply_actions', 'expected_content'), (
-        (True, 2),
+        ('True', 2),
         (None, 0)
 ))
 def test_reassess_similarity(client, auth, app, apply_actions, expected_content):
     """ test the requesting of a ticket to be reassessed for similarities """
 
     auth.login()
-    response = client.post('ticket/1/reassess_similarity', data={'apply_actions': apply_actions})
+    response = client.post(f'ticket/1/reassess_similarity?apply_actions={apply_actions}')
     assert response.status_code == 302
     assert b"""<a href="/ticket/1/edit">/ticket/1/edit</a>""" in response.data
     with app.app_context():

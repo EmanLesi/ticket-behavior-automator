@@ -14,9 +14,9 @@
 
     <form method="post">
         <label for="title">Title</label> <br>
-        <input name="title" size="50" id="title" value="{{ request.form['title'] }}" placeholder="A title is required" required> <br><br>
+        <input name="title" size="50" id="title" value="{{ request.form['title'] }}" placeholder="A title is required" maxlength="256" required> <br><br>
         <label for="description">Description</label> <br>
-        <textarea name="description" id="description" cols="53" rows="5" placeholder="A description is optional but advised"></textarea> <br>
+        <textarea name="description" id="description" cols="53" rows="5" placeholder="A description is optional but advised" maxlength="512"></textarea> <br>
         <input type="submit" class="btn btn-primary" style="width:390px" value="create ticket">
     </form>
 </div>

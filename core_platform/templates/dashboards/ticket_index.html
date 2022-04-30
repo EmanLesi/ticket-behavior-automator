@@ -38,10 +38,9 @@
                                     <option value="reporter">reporter</option>
                                     <option value="assignee">assignee</option>
                                 </optgroup>
-                            </select>
+                            </select> <br>
                         <label for="query_value"> Value: </label>
-                        <input name="query_value" id="query_value" value="{%if query_holding_value %}{{ query_holding_value }}{% elif query_value %}{{ query_value }}{% endif %}" placeholder="Value to find in field">
-                        <hr class="bar-separator" style="max-width: 400px">
+                        <input name="query_value" id="query_value" value="{%if query_holding_value %}{{ query_holding_value }}{% elif query_value %}{{ query_value }}{% endif %}" placeholder="Value to find in field" maxlength="256">
                         <h4>Sort</h4>
                             <label for="query_order_field">Order By </label>
                                 <select name="query_order_field" id="query_order_field">
@@ -64,7 +63,6 @@
                             </select>
 
                             <label for="query_order_value"> Order </label> <br>
-                        <hr class="bar-separator" style="max-width: 400px">
                         <input class="btn btn-primary" type="submit" value="Run Query">
                          <a class="btn btn-default" href="{{ url_for('ticket_views.ticket_index') }}" role="button">Reset</a>
                     </form>
@@ -84,27 +82,27 @@
                 <div class="panel-body">
                     <div class="container">
                         <div class="row">
-                            <div class="col-6 col-sm-4">Status: <span class="label label-default ticket-status-{{ ticket['status'] | replace(' ','-') }}">{{ ticket['status'] }}</span></div>
-                            <div class="col-6 col-sm-4">Priority: <span class="label label-default ticket-priority-{{ ticket['priority'] }}">{{ ticket['priority'] }}</span></div>
+                            <div class="col-6 col-sm-4"><b>Status: </b><span class="label label-default ticket-status-{{ ticket['status'] | replace(' ','-') }}">{{ ticket['status'] }}</span></div>
+                            <div class="col-6 col-sm-4"><b>Priority: </b><span class="label label-default ticket-priority-{{ ticket['priority'] }}">{{ ticket['priority'] }}</span></div>
                         </div>
 
                         <div class="w-100 d-none d-md-block"></div>
                         <div class="row">
-                            <div class="col-6 col-sm-4">Reporter: {{ ticket['user_reporter_name'] }} </div>
-                            <div class="col-6 col-sm-4">Assignee: {{ ticket['user_assignee_name'] }} </div>
+                            <div class="col-6 col-sm-4"><b>Reporter: </b>{{ ticket['user_reporter_name'] }} </div>
+                            <div class="col-6 col-sm-4"><b>Assignee: </b>{{ ticket['user_assignee_name'] }} </div>
                         </div>
 
                         <div class="w-100 d-none d-md-block"></div>
                         <div class="row">
-                            <div class="col-6 col-sm-4">Creation Time: {{ ticket['creation_time'] }} </div>
-                            <div class="col-6 col-sm-4">Updated Time: {{ ticket['update_time'] }} </div>
+                            <div class="col-6 col-sm-4"><b>Creation Time: </b>{{ ticket['creation_time'] }} </div>
+                            <div class="col-6 col-sm-4"><b>Updated Time: </b>{{ ticket['update_time'] }} </div>
                         </div>
                     </div>
 
                     <div class="ticket-panel-content">
-                        Category:
-                        {% if ticket['category_id'] and ticket['category_id'] < existing_categories_length %}
-                        {{ existing_categories[ticket['category_id']]['name'] }}
+                        <b>Category:</b>
+                        {% if ticket['category_id'] and (ticket['category_id'] <= existing_categories_length) %}
+                        {{ existing_categories[ticket['category_id']-1]['name'] }}
                         {% else %} None {% endif %}
                         <br>
                         <h3> Description: </h3>

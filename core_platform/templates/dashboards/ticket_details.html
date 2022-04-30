@@ -5,10 +5,17 @@
 <div class="ticket-content-body">
 
     {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning alert-dismissible alert-bar" role="alert">
-            <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>  {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        </div>
+        {% if 'SUCCESS - ' in message %}
+            <div class="alert alert-success alert-dismissible alert-bar" role="alert" style="word-wrap: break-word;">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>  {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+        {% else %}
+            <div class="alert alert-warning alert-dismissible alert-bar" role="alert" style="word-wrap: break-word;">
+                <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>  {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+        {% endif %}
     {% endfor %}
 
     <div class="panel panel-default ticket-panel">
@@ -65,9 +72,9 @@
                             <div class="col-6 col-sm-5">
                                 <label for="assignee">Assignee: </label>
                                 {% if ticket['user_assignee_name'] %}
-                                    <input list="assignees" name="assignee" id="assignee" value="{{ ticket['user_assignee_name'] }}" placeholder="pick an existing user to be the new assignee">
+                                    <input list="assignees" name="assignee" id="assignee" value="{{ ticket['user_assignee_name'] }}" placeholder="pick an existing user to be the new assignee" maxlength="128">
                                 {% else %}
-                                    <input list="assignees" name="assignee" id="assignee" placeholder="pick assignee from existing users">
+                                    <input list="assignees" name="assignee" id="assignee" placeholder="pick assignee from existing users" maxlength="128">
                                 {% endif %}
                                     <datalist id="assignees">
                                         {% for user in available_assignees %}
@@ -88,9 +95,9 @@
                     <div class="ticket-panel-content">
                         <label for="category" >Category: </label>
                         {% if ticket['category_name'] %}
-                            <input list="categories" name="category" id="category" value="{{ ticket['category_name'] }}" placeholder="enter a new category name here or pick an existing category" style="width: -webkit-fill-available;">
+                            <input list="categories" name="category" id="category" value="{{ ticket['category_name'] }}" placeholder="enter a new category name here or pick an existing category or enter 'None' to remove category" maxlength="128" style="width: -webkit-fill-available;">
                         {% else %}
-                            <input list="categories" name="category" id="category" placeholder="enter a new category name here or pick an existing category" style="width: -webkit-fill-available;">
+                            <input list="categories" name="category" id="category" placeholder="enter a new category name here or pick an existing category or enter 'None' to remove category" maxlength="128" style="width: -webkit-fill-available;">
                         {% endif %}
                             <datalist id="categories">
                                 <option value="None">
@@ -121,20 +128,32 @@
                 <p>Title Similarity: <span class="badge">{{ (sim['title_sim'] * 100)| round(2)  }}%</span> {% if ticket['short_description_flag'] == 0 %} | Description Similarity: <span class="badge">{{ (sim['desc_sim'] * 100)| round(2) }}%</span>{% endif %}<br>
                     <b>Status:</b> <span class="label label-default ticket-status-{{ similar_ticket_attributes[sim['comp_ticket']][0] | replace(' ','-') }}">{{ similar_ticket_attributes[sim['comp_ticket']][0] }}</span> |
                     <b>Priority:</b> <span class="label label-default ticket-priority-{{ similar_ticket_attributes[sim['comp_ticket']][1] }} ">{{ similar_ticket_attributes[sim['comp_ticket']][1] }} </span> |
-                    <b>Assignee:</b> {{ similar_ticket_attributes[sim['comp_ticket']][2] }} |
-                    <b>Category:</b> {{ similar_ticket_attributes[sim['comp_ticket']][3] }} | <b>Potential Solutions:</b> {{ similar_ticket_attributes[sim['comp_ticket']][4] }}
+                    <b>Assignee:</b> {% if similar_ticket_attributes[sim['comp_ticket']][2] %} {{ similar_ticket_attributes[sim['comp_ticket']][2]}} {% else %} None {% endif %}
+                    <br><b>Category:</b> {{ similar_ticket_attributes[sim['comp_ticket']][3] }} <br><b>Potential Solutions:</b> {{ similar_ticket_attributes[sim['comp_ticket']][4] }}
                 </p>
             </a>
         {% endfor %}
         </div>
+        <h4>Recommended Ticket Properties</h4>
+            <div class="panel panel-default ticket-detail-section">
+                <div class="panel-body">
+                    <b>Status:</b> <span class="label label-default ticket-status-{{ recommended_values[0] | replace(' ','-') }}">{{ recommended_values[0] }}</span> |
+                    <b>Priority:</b> <span class="label label-default ticket-priority-{{ recommended_values[1] }} ">{{ recommended_values[1] }} </span> |
+                    <b>Assignee:</b> {{ recommended_values[2] }}
+                    <br><b>Category:</b> {{ recommended_values[3] }}
+                </div>
+            </div>
     {% else %}
     <div class="well ticket-detail-section">NO SIMILAR TICKETS FOUND</div>
     {% endif %}
-    <form action="{{ url_for('ticket_views.reassess_similarity', ticket_id=ticket['id']) }}" method="post">
+    <form action="{{ url_for('ticket_views.reassess_similarity', ticket_id=ticket['id']) }}?apply_actions=False" method="post">
         <p style="max-width: 800px; text-align:center;">
-            <input class="btn btn-info" style="width: -webkit-fill-available;" type="submit" value="Reassess Similarity" onclick="return confirm('Are you sure?');">
-            <input type="checkbox" id="apply_actions" name="apply_actions" value="True">
-            <label for="apply_actions">Automatically Apply Actions</label>
+            <input class="btn btn-default" style="width: -webkit-fill-available;" type="submit" value="Reassess Similarity" onclick="return confirm('Are you sure that you want to reassess similarities on this ticket?');">
+        </p>
+    </form>
+    <form action="{{ url_for('ticket_views.reassess_similarity', ticket_id=ticket['id']) }}?apply_actions=True" method="post">
+        <p style="max-width: 800px; text-align:center;">
+            <input class="btn btn-info" style="width: -webkit-fill-available;" type="submit" value="Apply Recommended Actions and Properties" onclick="return confirm('Are you sure that you want to reassess and apply the recommend properties to this ticket?');">
         </p>
     </form>
 
@@ -165,7 +184,7 @@
     <div class="ticket-detail-section">
         <h3>Comment</h3>
         <form method="post" action="{{ url_for('ticket_views.make_comment_on_ticket', ticket_id=ticket['id']) }}" style="text-align: center;">
-            <textarea name="comment_action" id="comment_action" placeholder="add a comment here | use the checkbox if the comment is a solution" cols="100" rows="1" required></textarea>
+            <textarea name="comment_action" id="comment_action" placeholder="add a comment here | use the checkbox if the comment is a solution" cols="100" rows="1" maxlength="512" required></textarea>
             <br>
             <input type="checkbox" id="solution_checkbox" name="solution_checkbox" value="True">
             <label for="solution_checkbox">Mark As Solution</label><br>
@@ -176,8 +195,8 @@
     <h2>Actions</h2>
     {% if ticket_actions %}
         {% for action in ticket_actions %}
-            <ul class="list-group action-group">
-                <li class="list-group-item" style="text-align: center;">
+            <div class="panel panel-default action-group">
+                <div class="panel-heading" style="text-align: center;">
                     <span style="float: left; font-weight: bold">
                         {% if action['username']  %}
                             {{action['username']}}
@@ -188,19 +207,19 @@
                         {% endif %}
                     </span>
                     {{ action['action_type'] }}
-                    <span class="badge">{{ action['creation_time'] }}</span>
-                </li>
+                    <span class="badge" style="float: right;">{{ action['creation_time'] }}</span>
+                </div>
                 {% if action['action_content'] %}
-                <li class="list-group-item">
+                <div class="panel-body" style="word-wrap: break-word;">
                     {{ action['action_content'] }}
-                </li>
+                </div>
                 {% endif%}
-                <li class="list-group-item">
+                <div class="panel-footer">
                     <form action="{{ url_for('ticket_views.delete_action', ticket_id=ticket['id'], action_id=action['action_id']) }}" method="post">
                         <input  class="btn btn-danger" style="width: -webkit-fill-available;" type="submit" value="Delete Action" onclick="return confirm('Are you sure that you want to remove this action from this ticket's history?');">
                     </form>
-                </li>
-            </ul>
+                </div>
+            </div>
         {% endfor%}
     {% else %}
         <p> NO ACTIONS HAVE BEEN PERFORMED ON THIS TICKET </p>

@@ -122,22 +122,23 @@ def test_perform_manual_category_change(app, value, action_count_increment):
         assert len(new_ticket_actions) == len(old_ticket_actions) + action_count_increment
 
 
-@pytest.mark.parametrize(('value', 'new_status', 'action_count_increment'), (
-        (3, DB_TICKET_STATUS_VALUE[1], 1),
-        (2, DB_TICKET_STATUS_VALUE[2], 0),
+@pytest.mark.parametrize(('ticket_id', 'value', 'new_status', 'action_count_increment'), (
+        (1, 2, DB_TICKET_STATUS_VALUE[1], 1),
+        (3, 3, DB_TICKET_STATUS_VALUE[2], 1),
+        (3, 2, DB_TICKET_STATUS_VALUE[2], 0),
 ))
-def test_perform_manual_assignee_change(app, value, new_status, action_count_increment):
+def test_perform_manual_assignee_change(app, ticket_id, value, new_status, action_count_increment):
     """ test procedure to change ticket assignee """
 
     with app.app_context():
-        old_assignee = get_individual_ticket_for_edit(3)['assignee']
-        old_ticket_actions = get_ticket_actions_for_view(3)
+        old_assignee = get_individual_ticket_for_edit(ticket_id)['assignee']
+        old_ticket_actions = get_ticket_actions_for_view(ticket_id)
         assignee_name = get_username_from_id(value)['username']
 
-        perform_manual_assignee_change(value, old_assignee, assignee_name, 3, 0)
+        perform_manual_assignee_change(value, old_assignee, assignee_name, ticket_id, 0)
 
-        new_ticket = get_individual_ticket_for_edit(3)
-        new_ticket_actions = get_ticket_actions_for_view(3)
+        new_ticket = get_individual_ticket_for_edit(ticket_id)
+        new_ticket_actions = get_ticket_actions_for_view(ticket_id)
         assert new_ticket['assignee'] == value
         assert new_ticket['status'] == new_status
         assert len(new_ticket_actions) == len(old_ticket_actions) + action_count_increment
@@ -161,3 +162,20 @@ def test_perform_solution_feedback(app, content, solution_status, new_ticket_sta
         if content != REJECTED_SOLUTION:
             assert get_ticket_action_by_id(get_most_recent_solution(1)['id'])['action_type'] ==\
                    expected_outcome_sim_ticket
+
+
+@pytest.mark.parametrize(('attribute_sets', 'expected_outcome'), (
+        ([["assigned", "high", "Off Center Items", "test_user"],
+          ["assigned", "high", "None", "another_user"],
+          ["assigned", "high", "None", "another_user"]],
+         ["assigned", "high", NO_VALUE_RECOMMENDATION_FOUND, NO_VALUE_RECOMMENDATION_FOUND]),
+        ([["assigned", "high", "Off Center Items", "another_user"], ["New", "none", "None", "None"]],
+         [NO_VALUE_RECOMMENDATION_FOUND, NO_VALUE_RECOMMENDATION_FOUND, NO_VALUE_RECOMMENDATION_FOUND,
+          NO_VALUE_RECOMMENDATION_FOUND]),
+        ([["assigned", "high", "Off Center Items", "another_user"]],
+         ["assigned", "high", "Off Center Items", "another_user"]),
+))
+def test_extract_recommended_values(attribute_sets, expected_outcome):
+    """ test extraction of common values from a group of attribute sets """
+
+    assert extract_recommended_values(attribute_sets) == expected_outcome
