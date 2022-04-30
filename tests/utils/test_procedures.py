@@ -162,3 +162,20 @@ def test_perform_solution_feedback(app, content, solution_status, new_ticket_sta
         if content != REJECTED_SOLUTION:
             assert get_ticket_action_by_id(get_most_recent_solution(1)['id'])['action_type'] ==\
                    expected_outcome_sim_ticket
+
+
+@pytest.mark.parametrize(('attribute_sets', 'expected_outcome'), (
+        ([["assigned", "high", "Off Center Items", "test_user"],
+          ["assigned", "high", "None", "another_user"],
+          ["assigned", "high", "None", "another_user"]],
+         ["assigned", "high", NO_VALUE_RECOMMENDATION_FOUND, NO_VALUE_RECOMMENDATION_FOUND]),
+        ([["assigned", "high", "Off Center Items", "another_user"], ["New", "none", "None", "None"]],
+         [NO_VALUE_RECOMMENDATION_FOUND, NO_VALUE_RECOMMENDATION_FOUND, NO_VALUE_RECOMMENDATION_FOUND,
+          NO_VALUE_RECOMMENDATION_FOUND]),
+        ([["assigned", "high", "Off Center Items", "another_user"]],
+         ["assigned", "high", "Off Center Items", "another_user"]),
+))
+def test_extract_recommended_values(attribute_sets, expected_outcome):
+    """ test extraction of common values from a group of attribute sets """
+
+    assert extract_recommended_values(attribute_sets) == expected_outcome

@@ -1,7 +1,7 @@
 """ reoccurring database interactions """
 from core_platform.db.db_manager import get_db
 from core_platform.utils.constants import DB_CATEGORY_NONE_NAME, DB_TICKET_STATUS_VALUE, DB_TICKET_PRIORITY_VALUE, \
-    DB_FAIL, DB_SUCCESS, DB_TICKET_FIELD_NAMES
+    DB_FAIL, DB_SUCCESS, DB_TICKET_FIELD_NAMES, DB_USER_NONE_NAME
 
 
 def fetchall_tickets_for_index():
@@ -148,7 +148,10 @@ def get_all_category_names():
 def get_username_from_id(user_id):
     """ get username from id """
 
-    return get_db().execute('SELECT username from user WHERE id = ?', (user_id,)).fetchone()
+    username = get_db().execute('SELECT username from user WHERE id = ?', (user_id,)).fetchone()
+    if username is None:
+        username = {'username': DB_USER_NONE_NAME}
+    return username
 
 
 def get_id_of_user(username):

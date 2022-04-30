@@ -153,12 +153,13 @@ def test_get_all_category_names(app):
         assert len(db_output) == 3
 
 
-def test_get_username_from_id(app):
+@pytest.mark.parametrize(('value', 'expected_value'),
+                         ((1, "test_user"), (999, DB_USER_NONE_NAME)))
+def test_get_username_from_id(app, value, expected_value):
     """ test getting the username from id """
 
     with app.app_context():
-        db_output = get_username_from_id(1)
-        assert db_output['username'] == 'test_user'
+        assert get_username_from_id(value)['username'] == expected_value
 
 
 def test_get_id_of_user(app):
