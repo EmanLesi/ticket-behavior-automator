@@ -1,4 +1,5 @@
 """ views for ticket management  """
+
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -71,22 +72,19 @@ def make_comment_on_ticket(ticket_id):
 
             comment_type = MADE_A_COMMENT_ACTION
 
-            print(solution_checkbox)
-
             # check if comment is a solution
             if get_check_box_value(solution_checkbox):
                 comment_type = PROPOSED_A_SOLUTION_ACTION
-            print(comment_type)
+
             # add comment to action on a ticket
             user_id = get_id_of_user(g.user['username'])['id']
             if insert_action_into_db(ticket_id, comment_type, comment_action, user_id) == DB_FAIL:
                 flash(COMMENT_NOT_ADDED_DB_ISSUE)
             else:
-                print(comment_type)
                 if comment_type == PROPOSED_A_SOLUTION_ACTION:
-                    print("here")
                     set_ticket_status_in_db(DB_TICKET_STATUS_VALUE[3], ticket_id)
                 set_ticket_update_time_to_now(ticket_id)
+                flash(COMMENT_MADE.format(g.user['username'], comment_type.lower()))
         else:
             flash(COMMENT_NOT_ADDED_NO_CONTENT)
         return redirect(url_for(VIEW_TICKET_VIEW, ticket_id=ticket_id))
@@ -118,12 +116,6 @@ def edit(ticket_id):
 
         user_id = get_id_of_user(g.user['username'])['id']
 
-        # set new status
-        perform_manual_status_change(new_status, old_status, ticket_id, user_id)
-
-        # set new priority
-        perform_manual_priority_change(new_priority, old_priority, ticket_id, user_id)
-
         # set new category
         if is_valid_text_field(new_category_name):
 
@@ -137,19 +129,36 @@ def edit(ticket_id):
                 insert_new_category(new_category_name)
                 new_category = get_id_of_category(new_category_name)
 
-            perform_manual_category_change(new_category['id'], old_category, new_category_name, ticket_id, user_id)
+            if perform_manual_category_change(new_category['id'], old_category, new_category_name, ticket_id, user_id):
+                flash(FIELD_UPDATE_SUCCESS.format(DB_TICKET_FIELD_NAMES[3], get_name_of_category(old_category)['name'],
+                                                  new_category_name))
+
+        elif len(new_category_name) > TEXT_INPUT_CHARACTER_LIMIT:
+            flash(NEW_CATEGORY_NAME_IS_TOO_LONG)
 
         # set new assignee
         if is_valid_text_field(new_assignee_user):
             # varify the existence of the assignee as a user in the system
-            new_assignee = get_id_of_user(new_assignee_user, )
+            new_assignee = get_id_of_user(new_assignee_user)
 
             # set new assignee
             if new_assignee is not None:
-                perform_manual_assignee_change(new_assignee['id'], old_assignee, new_assignee_user, ticket_id, user_id)
+                if perform_manual_assignee_change(new_assignee['id'], old_assignee, new_assignee_user, ticket_id,
+                                                  user_id):
+                    flash(FIELD_UPDATE_SUCCESS.format(DB_TICKET_FIELD_NAMES[6],
+                                                      get_username_from_id(old_assignee)['username'],
+                                                      new_assignee_user))
 
             else:
                 flash(NEW_ASSIGNEE_NOT_FOUND)
+
+        # set new status
+        if perform_manual_status_change(new_status, old_status, ticket_id, user_id):
+            flash(FIELD_UPDATE_SUCCESS.format(DB_TICKET_FIELD_NAMES[4], old_status, new_status))
+
+        # set new priority
+        if perform_manual_priority_change(new_priority, old_priority, ticket_id, user_id):
+            flash(FIELD_UPDATE_SUCCESS.format(DB_TICKET_FIELD_NAMES[7], old_priority, new_priority))
 
     # get all associated ticket data across tables in the database
     ticket = get_individual_ticket_for_view(ticket_id)
@@ -170,11 +179,18 @@ def edit(ticket_id):
         similar_ticket_fields = get_individual_ticket_for_edit(similar_ticket['comp_ticket'])
         similar_ticket_attributes[similar_ticket['comp_ticket']] = [similar_ticket_fields['status'],
                                                                     similar_ticket_fields['priority'],
-                                                                    get_id_of_user(similar_ticket_fields['assignee']),
+                                                                    get_username_from_id(
+                                                                        similar_ticket_fields['assignee'])['username'],
                                                                     get_name_of_category(
                                                                         similar_ticket_fields['category'])['name'],
                                                                     len(get_all_solutions_from_tickets(
                                                                         similar_ticket['comp_ticket']))]
+
+    # resolve recommendations for view
+    recommended_values = None
+
+    if len(similar_ticket_attributes) > 0:
+        recommended_values = extract_recommended_values(list(similar_ticket_attributes.values()))
 
     # get existing users and categories
     assignees = get_all_registered_users()
@@ -182,7 +198,8 @@ def edit(ticket_id):
 
     return render_template(VIEW_TICKET_PAGE_TEMPLATE_LOCATION, ticket=ticket, ticket_actions=ticket_actions,
                            available_assignees=assignees, registered_categories=registered_categories,
-                           ticket_sims=ticket_sims, similar_ticket_attributes=similar_ticket_attributes)
+                           ticket_sims=ticket_sims, similar_ticket_attributes=similar_ticket_attributes,
+                           recommended_values=recommended_values)
 
 
 @login_required
@@ -215,10 +232,12 @@ def solution_feedback(ticket_id):
                 perform_solution_feedback(content, solution_status, new_ticket_status, last_solution['id'], ticket_id,
                                           g.user['id'])
 
+                flash(SOLUTION_FEEDBACK_RECORDED.format(content))
+
             else:
                 flash(NO_SOLUTIONS_HAVE_BEEN_PROPOSED)
-
-        flash(SELECT_FEEDBACK_OPTION)
+        else:
+            flash(SELECT_FEEDBACK_OPTION)
 
     return redirect(url_for(VIEW_TICKET_VIEW, ticket_id=ticket_id))
 
@@ -231,6 +250,7 @@ def delete_action(ticket_id, action_id):
     ticket = get_ticket_id(ticket_id)
     if ticket is not None:
         delete_action_from_ticket(ticket_id, action_id)
+        flash(ACTION_DELETED)
         return redirect(url_for(VIEW_TICKET_VIEW, ticket_id=ticket_id))
 
     flash(TICKET_NOT_FOUND.format(ticket_id))
@@ -243,6 +263,7 @@ def delete_ticket(ticket_id):
     """ delete a ticket and related objects"""
 
     delete_all_associated_with_ticket(ticket_id)
+    flash(TICKET_DELETED.format(ticket_id))
     return redirect(url_for(TICKET_INDEX_VIEW))
 
 
@@ -252,9 +273,15 @@ def reassess_similarity(ticket_id):
     """ reassess ticket similarity """
 
     if request.method == "POST":
-        apply_actions = request.form.get('apply_actions')
+        apply_actions = request.args.get('apply_actions')
 
-        perform_ticket_analysis(apply_actions, ticket_id)
+        if apply_actions == 'True':
+            perform_ticket_analysis(True, ticket_id)
+            flash(TICKET_SIMILARITY_UPDATE)
+            flash(RECOMMEND_ACTIONS_APPLIED)
+        else:
+            perform_ticket_analysis(False, ticket_id)
+            flash(TICKET_SIMILARITY_UPDATE)
 
     return redirect(url_for(VIEW_TICKET_VIEW, ticket_id=ticket_id))
 

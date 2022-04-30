@@ -38,6 +38,7 @@ UNABLE_TO_CREATE_TICKET_INVALID_CONTENT = "Unable To Create Ticket - Invalid Con
 COMMENT_NOT_ADDED_DB_ISSUE = "COMMENT NOT ADDED - unable to add comment to ticket"
 COMMENT_NOT_ADDED_NO_CONTENT = "COMMENT NOT ADDED - your comment does not have any content"
 NEW_ASSIGNEE_NOT_FOUND = "NEW ASSIGNEE USER NOT FOUND - restoring previous value"
+NEW_CATEGORY_NAME_IS_TOO_LONG = "new category name is too long - reverting to previous value"
 NOT_A_USER = "{} - Is not a registered user"
 NOT_A_CATEGORY = "{} - Is not a registered category"
 TICKET_NOT_FOUND = "Ticket with id {} does not exist."
@@ -47,10 +48,21 @@ DESCRIPTION_LENGTH_ABOVE_CHARACTER_LIMIT = f"the description is longer than the 
                                            f" characters"
 
 
+# success messages
+FIELD_UPDATE_SUCCESS = "SUCCESS - {0} updated from '{1}' to '{2}'"
+TICKET_SIMILARITY_UPDATE = "SUCCESS - Ticket similarities have been updated"
+RECOMMEND_ACTIONS_APPLIED = "SUCCESS - Recommended actions and properties have been applied to this ticket"
+TICKET_DELETED = "Ticket #{} has been deleted"
+ACTION_DELETED = "SUCCESS - Action Deleted"
+SOLUTION_FEEDBACK_RECORDED = "SUCCESS - Feedback recorded '{}'"
+COMMENT_MADE = "SUCCESS - {} has {}"
+
+
 # nlp constants
 SPACY_PIPELINE = 'en_core_web_lg'
 NLP = spacy.load(SPACY_PIPELINE)
 DEFAULT_FOR_NO_DESCRIPTION = "NO DESCRIPTION"
+NO_VALUE_RECOMMENDATION_FOUND = "No Value Recommendation Found"
 TITLE_SIMILARITY_THRESHOLD = 0.8
 TITLE_WITH_DESC_SIMILARITY_THRESHOLD = 1.6
 SIMILARITY_GROUP_SIZE = 3
